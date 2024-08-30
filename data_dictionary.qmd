@@ -1,0 +1,68 @@
+---
+title: "Data Dictionary"
+format: html
+---
+
+```{r}
+library(tidyverse)
+
+## list matches available: default gives all matches
+fetch_match_info <- function(year = "(.|\\s)*\\S(.|\\s)*",
+                             player_last = "(.|\\s)*\\S(.|\\s)*",
+                             round = "(.|\\s)*\\S(.|\\s)*") {
+
+  file_vec <- list.files(path = "data/")
+  contains_year <- file_vec |>
+    str_detect(pattern = as.character(year))
+  contains_player <- file_vec |>
+    str_detect(pattern = str_to_title(player_last))
+
+  ## round should be F, SF, QF, R16, R32, R64, or R128
+  contains_round <- file_vec |>
+    str_detect(pattern = paste0("_", round, "_"))
+  matches_of_interest <- file_vec[contains_year & contains_player & contains_round]
+
+  return(matches_of_interest)
+}
+
+fetch_match_info() ## should give all matches in data/ folder
+fetch_match_info(year = "2023", player_last = "Alcaraz")
+fetch_match_info(year = "2023", player_last = "Alcaraz", round = "QF")
+match_alc_tsits <- fetch_match_info(year = "2023", player_last = "Alcaraz", round = "QF")
+
+test_match <- read_csv(here::here(paste0("data/", match_alc_tsits)))
+test_match
+
+fetch_match_info(year = "2023")
+fetch_match_info(year = "2022")
+fetch_match_info(year = "2021")
+fetch_match_info(year = "2020")
+fetch_match_info(year = "2019")
+```
+
+The following are the variables scraped in from Court Vision at Rolland Garros. The description is my current best understanding of what each variable means, starting with what I think are some of the more interesting variables.
+
+* `trajectoryData`, the most detailed of all of the variables. Ball position is given in meters, where
+    * `x` is the court length-coordinate (`0` is the net, negative values are distance from the net on one side, positive values are distance from the net on the other)
+    * `y` is the court width-coordinate (`0` is the center line, negative values are distance from the center line to one half of the court, positive values are distance from center line to the other half)
+    * `z` is the height coordinate (`0` is the ground)
+    * `position` is the position "type" (either `hit` for when a player hits the ball, `net` for when the ball crosses the net, `bounce` for when the ball bounces, `peak` for the position at the ball's max height).
+
+This variable can get quite lengthy if the rally was long, as in:
+
+```{r}
+test_match[7, "trajectoryData"] |> as.vector()
+```
+
+* `serveType`, `pointEndType`, `strokeType`,  give the type of serve hit (Flat, Slice, Kick, etc.) as well as how the point ended and with what stroke ended the point (unforced error, winner, forced error, etc. along with groundstroke, drop, lob, etc.)
+* `ballSpeedKMH` and `heightAboveNetM` are the ball speed (in kmh) and the height of the ball above the net (in meters) for (I think) the serve....
+* `winnerPlacement` is the type of winner (cross, down the line, `NA` for no winner)
+* `errorType` is the type of error made (long, net, wide, `NA` for no error).
+* `unforcedErrorPlacement` is slightly different than `errorType`. Error type will include the type of error for a missed first serve whereas unforced error placement is more strict (and won't count a missed first serve as an error).
+* `pointId` is set number, game number, point number, serve number
+* `serverId`, `scorerId`, `receiverId` are the player id's for the server, who won he point, and the receiver, respectively
+* `serverCordinate` and `receiverCordinate`: these are slightly different than the "hit" position of the ball in `trajectoryData`, so they must be the positions of the server and receiver themselves. I am not sure if the receiver coordinate is the position of the player before they strike the ball, or, if its the position of the receiver after the serve is struck. Either way, the receiver cordinate is particularly interesting as it gives where the receiver stands, and can be used to see if that position changes throughout the match (or, if a player seems to adjust where they stand depending on who they are playing).
+* the rest are either less interesting, have too many missing values to be useful (like spin), or seem to be simpler versions of the trajectory Data column.
+
+
+
