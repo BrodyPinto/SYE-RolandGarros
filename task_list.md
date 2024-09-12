@@ -1,5 +1,27 @@
 ## Task List
 
+### For September 19
+
+1. Get player hit variable correct.
+
+2. A bit of data deep diving with things like errors that go off the court, let serves, does the data distinguish between a made and missed return? how is a return winner coded? are faulty serves counted as an additional point?
+
+
+trajectory_formatted_df |> mutate(is_hit = if_else(position == " hit",
+                                                  true = 1, false = 0)) |>
+  relocate(is_hit) |>
+  group_by(point_index) |>
+  mutate(shot_index2 = cumsum(is_hit)) |>
+  relocate(shot_index2)
+  
+
+### For September 12
+
+1. Format the data to be a column for type, x, y, z, player_hit.
+
+2. Pick a match. Get the serve bounce locations and the return bounce locations and make a graph of each for one player.
+
+
 ### For September 5
 
 1. Read Paper <https://martiningram.github.io/papers/hot-heads-cool-heads.pdf> (no need to focus on details).
@@ -8,10 +30,5 @@
 
 3. Mess around with data on other git repo (put /data folder in gitignore so it doesn't get pushed to your SYE repo. It's fine to have that data on the courtvisionr repo because that repo is private. But, we'll eventually want to make your SYE repo public, so it shouldn't have that data on there).
 
-### For September 12
-
-1. Format the data to be a column for type, x, y, z, player_hit.
-
-2. Pick a match. Get the serve bounce locations and the return bounce locations and make a graph of each for one player.
 
 
