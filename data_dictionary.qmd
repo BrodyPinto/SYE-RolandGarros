@@ -5,6 +5,7 @@ format: html
 
 ```{r}
 library(tidyverse)
+library(here)
 
 ## list matches available: default gives all matches
 fetch_match_info <- function(year = "(.|\\s)*\\S(.|\\s)*",
@@ -40,7 +41,7 @@ fetch_match_info(year = "2020")
 fetch_match_info(year = "2019")
 ```
 
-The following are the variables scraped in from Court Vision at Rolland Garros. The description is my current best understanding of what each variable means, starting with what I think are some of the more interesting variables.
+The following are the variables scraped in from Court Vision at Roland Garros. The description is my current best understanding of what each variable means, starting with what I think are some of the more interesting variables.
 
 * `trajectoryData`, the most detailed of all of the variables. Ball position is given in meters, where
     * `x` is the court length-coordinate (`0` is the net, negative values are distance from the net on one side, positive values are distance from the net on the other)
@@ -64,5 +65,209 @@ test_match[7, "trajectoryData"] |> as.vector()
 * `serverCordinate` and `receiverCordinate`: these are slightly different than the "hit" position of the ball in `trajectoryData`, so they must be the positions of the server and receiver themselves. I am not sure if the receiver coordinate is the position of the player before they strike the ball, or, if its the position of the receiver after the serve is struck. Either way, the receiver cordinate is particularly interesting as it gives where the receiver stands, and can be used to see if that position changes throughout the match (or, if a player seems to adjust where they stand depending on who they are playing).
 * the rest are either less interesting, have too many missing values to be useful (like spin), or seem to be simpler versions of the trajectory Data column.
 
+## Format Trajectory Data
+```{r}
+test_match$trajectoryData[1]
+head(trajectory_formatted_df, 20)
+
+trajectory_formatted_df <- test_match |> mutate(point_index = row_number()) |>
+  mutate(trajectoryData = sub("^..", "", trajectoryData)) |>
+  mutate(trajectoryData = sub("..$", "", trajectoryData)) |>
+  separate_longer_delim(trajectoryData, delim = "}, {") |>
+  group_by(point_index) |>
+  mutate(shot_index = row_number()) |>
+  separate(trajectoryData, into = c("x", "y", "z", "position"), sep = "\\,") |>
+  mutate(x = parse_number(x),
+         y = parse_number(y),
+         z = parse_number(z),
+         position = sub("^............", "", position)) |>
+  mutate(position = gsub("'", "", position)) |>
+  mutate(player_hit = if_else(shot_index %% 2 == 1, serverId, receiverId)) |>
+  relocate(point_index, shot_index, x, y, z, position, player_hit, serverId, receiverId)
+trajectory_formatted_df
+```
+
+## Plot Serve Placement - 
+```{r}
+match_alc_tsits <- fetch_match_info(year = "2023", player_last = "Djokovic", round = "SF")
+test_match <- read_csv(here::here(paste0("data/", match_alc_tsits)))
+test_match
+
+head(trajectory_formatted_df, 20)
+
+trajectory_formatted_df <- test_match |> mutate(point_index = row_number()) |>
+  mutate(trajectoryData = sub("^..", "", trajectoryData)) |>
+  mutate(trajectoryData = sub("..$", "", trajectoryData)) |>
+  relocate(point_index, trajectoryData)
+  separate_longer_delim(trajectoryData, delim = "}, {") |>
+  group_by(point_index) |>
+  mutate(shot_index = row_number()) |>
+  separate(trajectoryData, into = c("x", "y", "z", "position"), sep = "\\,") |>
+  mutate(x = parse_number(x),
+         y = parse_number(y),
+         z = parse_number(z),
+         position = sub("^............", "", position)) |>
+  mutate(position = gsub("'", "", position)) |>
+  mutate(player_hit = if_else(shot_index %% 2 == 1, serverId, receiverId)) |>
+  relocate(point_index, shot_index, x, y, z, position, player_hit, serverId, receiverId)
+
+serve_bounce_df <- trajectory_formatted_df |>
+  filter(str_detect(position, "bounce")) |> ## only keep rows where serve bounced
+  group_by(point_index) |>
+  slice(1) |> ## keep only the first bounce, which should correspond to
+## the serve bounce (might drop serves that went into the net)
+  ungroup() |>
+  mutate(serve_in_or_out = if_else(pointEndType == "Faulty Serve",
+                                   true = "Fault", false = "In"))
+receive_bounce_df <- trajectory_formatted_df |>
+  filter(str_detect(position, "bounce")) |> ## only keep rows where serve bounced
+  group_by(point_index) |>
+  slice(2) |> ## keep only the second bounce, which should correspond to
+## the receive bounce (might drop returns that went into the net)
+  ungroup()
+
+djokovic_deuce <- serve_bounce_df |>
+  filter(serverId == 9801) |> ## keep only Djokovic serves (weird he doesn't come up in player dataset)
+  filter(court == "DeuceCourt")
+djokovic_ad <- serve_bounce_df |>
+  filter(serverId == 9801) |> ## keep only Djokovic serves
+  filter(court == "AdCourt")
+alcaraz_deuce <- serve_bounce_df |>
+  filter(serverId == 44408) |> ## keep only Alcaraz serves
+  filter(court == "DeuceCourt")
+alcaraz_ad <- serve_bounce_df |>
+  filter(serverId == 44408) |> ## keep only Alcaraz serves
+  filter(court == "AdCourt")
+
+djokovic_deuce_return <- receive_bounce_df |>
+  filter(receiverId == 9801) |> ## keep only Djokovic returns (weird he doesn't come up in player dataset)
+  filter(court == "DeuceCourt")
+djokovic_ad_return <- receive_bounce_df |>
+  filter(receiverId == 9801) |> ## keep only Djokovic returns
+  filter(court == "AdCourt")
+alcaraz_deuce_return <- receive_bounce_df |>
+  filter(receiverId == 44408) |> ## keep only Alcaraz returns
+  filter(court == "DeuceCourt")
+alcaraz_ad_return <- receive_bounce_df |>
+  filter(receiverId == 44408) |> ## keep only Alcaraz returns
+  filter(court == "AdCourt")
+
+djokovic_receive <- receive_bounce_df |>
+  filter(receiverId == 9801)
+alcaraz_receive <- receive_bounce_df |>
+  filter(receiverId == 44408)
+
+ggplot(data = djokovic_deuce, aes(x = x, y = y)) +
+  geom_density_2d_filled(show.legend = FALSE) +
+  geom_point(alpha = 0.4, size = 1, aes(colour = serve_in_or_out),
+             show.legend = FALSE) +
+  scale_colour_manual(values = c("red", "black")) +
+  ## draw the court
+  annotate(geom = "segment", y = 5.02, yend = 5.02, x = -11.88, xend = 11.88, alpha = 0.5) +
+  annotate(geom = "segment", y = 4.11, yend = 4.11, x = -11.88, xend = 11.88, alpha = 0.5) +
+  annotate(geom = "segment", y = -5.02, yend = -5.02, x = -11.88, xend = 11.88, alpha = 0.5) +
+  annotate(geom = "segment", y = -4.11, yend = -4.11, x = -11.88, xend = 11.88, alpha = 0.5) +
+  annotate(geom = "segment", y = 0, yend = 0, x = -6.4, xend = 6.4, alpha = 0.5) +
+  annotate(geom = "segment", x = 0, xend = 0, y = -5.02, yend = 5.02,
+           linetype = 2, alpha = 0.5) +
+  annotate(geom = "segment", x = -11.88, xend = -11.88, y = -5.02,
+           yend = 5.02, alpha = 0.5) +
+  annotate(geom = "segment", x = 11.88, xend = 11.88, y = -5.02,
+           yend = 5.02, alpha = 0.5) +
+  annotate(geom = "segment", x = -6.4, xend = -6.4, y = -4.11, yend = 4.11, alpha = 0.5) +
+  annotate(geom = "segment", x = 6.4, xend = 6.4, y = -4.11, yend = 4.11, alpha = 0.5) +
+  theme_void() +
+  coord_fixed() +## preserve the aspect ratio of a tennis court.
+  labs(title = "Djokovic Serving to Alcaraz on the Deuce Side")
+
+ggplot(data = alcaraz_deuce, aes(x = x, y = y)) +
+  geom_density_2d_filled(show.legend = FALSE) +
+  geom_point(alpha = 0.4, size = 1, aes(colour = serve_in_or_out),
+             show.legend = FALSE) +
+  scale_colour_manual(values = c("red", "black")) +
+  ## draw the court
+  annotate(geom = "segment", y = 5.02, yend = 5.02, x = -11.88, xend = 11.88, alpha = 0.5) +
+  annotate(geom = "segment", y = 4.11, yend = 4.11, x = -11.88, xend = 11.88, alpha = 0.5) +
+  annotate(geom = "segment", y = -5.02, yend = -5.02, x = -11.88, xend = 11.88, alpha = 0.5) +
+  annotate(geom = "segment", y = -4.11, yend = -4.11, x = -11.88, xend = 11.88, alpha = 0.5) +
+  annotate(geom = "segment", y = 0, yend = 0, x = -6.4, xend = 6.4, alpha = 0.5) +
+  annotate(geom = "segment", x = 0, xend = 0, y = -5.02, yend = 5.02,
+           linetype = 2, alpha = 0.5) +
+  annotate(geom = "segment", x = -11.88, xend = -11.88, y = -5.02,
+           yend = 5.02, alpha = 0.5) +
+  annotate(geom = "segment", x = 11.88, xend = 11.88, y = -5.02,
+           yend = 5.02, alpha = 0.5) +
+  annotate(geom = "segment", x = -6.4, xend = -6.4, y = -4.11, yend = 4.11, alpha = 0.5) +
+  annotate(geom = "segment", x = 6.4, xend = 6.4, y = -4.11, yend = 4.11, alpha = 0.5) +
+  theme_void() +
+  coord_fixed() +## preserve the aspect ratio of a tennis court.
+  labs(title = "Alcaraz Serving to Djokovic on the Deuce Side")
+
+ggplot(data = djokovic_ad_return, aes(x = x, y = y)) +
+  geom_density_2d_filled(show.legend = FALSE) +
+  geom_point(alpha = 0.7, size = 1, show.legend = FALSE) +
+  scale_colour_manual(values = c("red", "black")) +
+  ## draw the court
+  annotate(geom = "segment", y = 5.02, yend = 5.02, x = -11.88, xend = 11.88, alpha = 0.5) +
+  annotate(geom = "segment", y = 4.11, yend = 4.11, x = -11.88, xend = 11.88, alpha = 0.5) +
+  annotate(geom = "segment", y = -5.02, yend = -5.02, x = -11.88, xend = 11.88, alpha = 0.5) +
+  annotate(geom = "segment", y = -4.11, yend = -4.11, x = -11.88, xend = 11.88, alpha = 0.5) +
+  annotate(geom = "segment", y = 0, yend = 0, x = -6.4, xend = 6.4, alpha = 0.5) +
+  annotate(geom = "segment", x = 0, xend = 0, y = -5.02, yend = 5.02,
+           linetype = 2, alpha = 0.5) +
+  annotate(geom = "segment", x = -11.88, xend = -11.88, y = -5.02,
+           yend = 5.02, alpha = 0.5) +
+  annotate(geom = "segment", x = 11.88, xend = 11.88, y = -5.02,
+           yend = 5.02, alpha = 0.5) +
+  annotate(geom = "segment", x = -6.4, xend = -6.4, y = -4.11, yend = 4.11, alpha = 0.5) +
+  annotate(geom = "segment", x = 6.4, xend = 6.4, y = -4.11, yend = 4.11, alpha = 0.5) +
+  theme_void() +
+  coord_fixed() +## preserve the aspect ratio of a tennis court.
+  labs(title = "Djokovic Receiving on the Ad Side")
+
+ggplot(data = djokovic_receive, aes(x = x, y = y)) +
+  geom_density_2d_filled(show.legend = FALSE) +
+  geom_point(alpha = 0.7, size = 1, show.legend = FALSE) +
+  scale_colour_manual(values = c("red", "black")) +
+  ## draw the court
+  annotate(geom = "segment", y = 5.02, yend = 5.02, x = -11.88, xend = 11.88, alpha = 0.5) +
+  annotate(geom = "segment", y = 4.11, yend = 4.11, x = -11.88, xend = 11.88, alpha = 0.5) +
+  annotate(geom = "segment", y = -5.02, yend = -5.02, x = -11.88, xend = 11.88, alpha = 0.5) +
+  annotate(geom = "segment", y = -4.11, yend = -4.11, x = -11.88, xend = 11.88, alpha = 0.5) +
+  annotate(geom = "segment", y = 0, yend = 0, x = -6.4, xend = 6.4, alpha = 0.5) +
+  annotate(geom = "segment", x = 0, xend = 0, y = -5.02, yend = 5.02,
+           linetype = 2, alpha = 0.5) +
+  annotate(geom = "segment", x = -11.88, xend = -11.88, y = -5.02,
+           yend = 5.02, alpha = 0.5) +
+  annotate(geom = "segment", x = 11.88, xend = 11.88, y = -5.02,
+           yend = 5.02, alpha = 0.5) +
+  annotate(geom = "segment", x = -6.4, xend = -6.4, y = -4.11, yend = 4.11, alpha = 0.5) +
+  annotate(geom = "segment", x = 6.4, xend = 6.4, y = -4.11, yend = 4.11, alpha = 0.5) +
+  theme_void() +
+  coord_fixed() +## preserve the aspect ratio of a tennis court.
+  labs(title = "Djokovic Receiving (both Deuce and Ad)")
+
+ggplot(data = alcaraz_receive, aes(x = x, y = y)) +
+  geom_density_2d_filled(show.legend = FALSE) +
+  geom_point(alpha = 0.7, size = 1, show.legend = FALSE) +
+  scale_colour_manual(values = c("red", "black")) +
+  ## draw the court
+  annotate(geom = "segment", y = 5.02, yend = 5.02, x = -11.88, xend = 11.88, alpha = 0.5) +
+  annotate(geom = "segment", y = 4.11, yend = 4.11, x = -11.88, xend = 11.88, alpha = 0.5) +
+  annotate(geom = "segment", y = -5.02, yend = -5.02, x = -11.88, xend = 11.88, alpha = 0.5) +
+  annotate(geom = "segment", y = -4.11, yend = -4.11, x = -11.88, xend = 11.88, alpha = 0.5) +
+  annotate(geom = "segment", y = 0, yend = 0, x = -6.4, xend = 6.4, alpha = 0.5) +
+  annotate(geom = "segment", x = 0, xend = 0, y = -5.02, yend = 5.02,
+           linetype = 2, alpha = 0.5) +
+  annotate(geom = "segment", x = -11.88, xend = -11.88, y = -5.02,
+           yend = 5.02, alpha = 0.5) +
+  annotate(geom = "segment", x = 11.88, xend = 11.88, y = -5.02,
+           yend = 5.02, alpha = 0.5) +
+  annotate(geom = "segment", x = -6.4, xend = -6.4, y = -4.11, yend = 4.11, alpha = 0.5) +
+  annotate(geom = "segment", x = 6.4, xend = 6.4, y = -4.11, yend = 4.11, alpha = 0.5) +
+  theme_void() +
+  coord_fixed() +## preserve the aspect ratio of a tennis court.
+  labs(title = "Alcaraz Receiving (both Deuce and Ad)")
+```
 
 

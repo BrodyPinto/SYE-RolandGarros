@@ -54,6 +54,8 @@ long_df <- raw_df |> mutate(point_index = row_number()) |>
          y = parse_number(y),
          z = parse_number(z)) ## a couple of parsing warnings for rows with no coordinates
 
+long_df
+
 serve_bounce_df <- long_df |>
   filter(str_detect(position, "bounce")) |> ## only keep rows where serve bounced
   group_by(point_index) |>
