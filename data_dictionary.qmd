@@ -53,6 +53,20 @@ This variable can get quite lengthy if the rally was long, as in:
 
 ```{r}
 test_match[7, "trajectoryData"] |> as.vector()
+View(trajectory_formatted_df |> relocate(serveType, spin, ballSpeedKMH, heightAboveNetM, pointEndType))
+
+```
+
+```{r}
+table(trajectory_formatted_df$serveType) # What exactly does pronated mean?
+table(trajectory_formatted_df$pointEndType) 
+table(trajectory_formatted_df$strokeType)
+table(trajectory_formatted_df$winnerPlacement)
+table(trajectory_formatted_df$errorType)
+table(trajectory_formatted_df$unforcedErrorPlacement) # this one seems better to use?
+table(trajectory_formatted_df$position)
+View(trajectory_formatted_df |> filter(unforcedErrorPlacement == 'Net Error'))
+View(trajectory_formatted_df |> filter(abs(x) > 11.88 & position == 'bounce'))
 ```
 
 * `serveType`, `pointEndType`, `strokeType`,  give the type of serve hit (Flat, Slice, Kick, etc.) as well as how the point ended and with what stroke ended the point (unforced error, winner, forced error, etc. along with groundstroke, drop, lob, etc.)
@@ -62,14 +76,11 @@ test_match[7, "trajectoryData"] |> as.vector()
 * `unforcedErrorPlacement` is slightly different than `errorType`. Error type will include the type of error for a missed first serve whereas unforced error placement is more strict (and won't count a missed first serve as an error).
 * `pointId` is set number, game number, point number, serve number
 * `serverId`, `scorerId`, `receiverId` are the player id's for the server, who won he point, and the receiver, respectively
-* `serverCordinate` and `receiverCordinate`: these are slightly different than the "hit" position of the ball in `trajectoryData`, so they must be the positions of the server and receiver themselves. I am not sure if the receiver coordinate is the position of the player before they strike the ball, or, if its the position of the receiver after the serve is struck. Either way, the receiver cordinate is particularly interesting as it gives where the receiver stands, and can be used to see if that position changes throughout the match (or, if a player seems to adjust where they stand depending on who they are playing).
+* `serverCordinate` and `receiverCordinate`: these are slightly different than the "hit" position of the ball in `trajectoryData`, so they must be the positions of the server and receiver themselves. I am not sure if the receiver coordinate is the position of the player before they strike the ball, or, if its the position of the receiver after the serve is struck. Either way, the receiver coordinate is particularly interesting as it gives where the receiver stands, and can be used to see if that position changes throughout the match (or, if a player seems to adjust where they stand depending on who they are playing).
 * the rest are either less interesting, have too many missing values to be useful (like spin), or seem to be simpler versions of the trajectory Data column.
 
 ## Format Trajectory Data
 ```{r}
-test_match$trajectoryData[1]
-head(trajectory_formatted_df, 20)
-
 trajectory_formatted_df <- test_match |> mutate(point_index = row_number()) |>
   mutate(trajectoryData = sub("^..", "", trajectoryData)) |>
   mutate(trajectoryData = sub("..$", "", trajectoryData)) |>
@@ -80,14 +91,32 @@ trajectory_formatted_df <- test_match |> mutate(point_index = row_number()) |>
   mutate(x = parse_number(x),
          y = parse_number(y),
          z = parse_number(z),
-         position = sub("^............", "", position)) |>
+         position = sub("^.............", "", position)) |>
   mutate(position = gsub("'", "", position)) |>
-  mutate(player_hit = if_else(shot_index %% 2 == 1, serverId, receiverId)) |>
-  relocate(point_index, shot_index, x, y, z, position, player_hit, serverId, receiverId)
+  mutate(is_hit = if_else(position == " hit", true = 1, false = 0)) |>
+  group_by(point_index) |> 
+  mutate(hit_count = cumsum(is_hit)) |> 
+  mutate(player_hit = if_else(hit_count %% 2 == 1, serverId, receiverId)) |>
+  ungroup() |>
+  relocate(point_index, hit_count, x, y, z, position, pointEndType, player_hit, serverId, receiverId)
 trajectory_formatted_df
+
+table(trajectory_formatted_df$pointEndType)
+
 ```
 
-## Plot Serve Placement - 
+## `player_hit` variable
+```{r}
+trajectory_formatted_df |> 
+  mutate(is_hit = if_else(position == " hit", true = 1, false = 0)) |>
+  relocate(is_hit) |> 
+  group_by(point_index) |> 
+  mutate(hit_count = cumsum(is_hit)) |> 
+  mutate(player_hit = if_else(hit_count %% 2 == 1, serverId, receiverId)) |>
+  ungroup() |>
+```
+
+## Ploting Serve and Return Placement
 ```{r}
 match_alc_tsits <- fetch_match_info(year = "2023", player_last = "Djokovic", round = "SF")
 test_match <- read_csv(here::here(paste0("data/", match_alc_tsits)))
@@ -98,7 +127,6 @@ head(trajectory_formatted_df, 20)
 trajectory_formatted_df <- test_match |> mutate(point_index = row_number()) |>
   mutate(trajectoryData = sub("^..", "", trajectoryData)) |>
   mutate(trajectoryData = sub("..$", "", trajectoryData)) |>
-  relocate(point_index, trajectoryData)
   separate_longer_delim(trajectoryData, delim = "}, {") |>
   group_by(point_index) |>
   mutate(shot_index = row_number()) |>
@@ -109,7 +137,7 @@ trajectory_formatted_df <- test_match |> mutate(point_index = row_number()) |>
          position = sub("^............", "", position)) |>
   mutate(position = gsub("'", "", position)) |>
   mutate(player_hit = if_else(shot_index %% 2 == 1, serverId, receiverId)) |>
-  relocate(point_index, shot_index, x, y, z, position, player_hit, serverId, receiverId)
+  relocate(point_index, shot_index, x, y, z, position, pointEndType, player_hit, serverId, receiverId)
 
 serve_bounce_df <- trajectory_formatted_df |>
   filter(str_detect(position, "bounce")) |> ## only keep rows where serve bounced
@@ -269,5 +297,12 @@ ggplot(data = alcaraz_receive, aes(x = x, y = y)) +
   coord_fixed() +## preserve the aspect ratio of a tennis court.
   labs(title = "Alcaraz Receiving (both Deuce and Ad)")
 ```
+
+
+
+
+
+
+
 
 
