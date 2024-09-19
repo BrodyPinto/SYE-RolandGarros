@@ -93,13 +93,12 @@ trajectory_formatted_df <- test_match |> mutate(point_index = row_number()) |>
          z = parse_number(z),
          position = sub("^.............", "", position)) |>
   mutate(position = gsub("'", "", position)) |>
-  mutate(is_hit = if_else(position == " hit", true = 1, false = 0)) |>
+  mutate(is_hit = if_else(position == "hit", true = 1, false = 0)) |>
   group_by(point_index) |> 
   mutate(hit_count = cumsum(is_hit)) |> 
   mutate(player_hit = if_else(hit_count %% 2 == 1, serverId, receiverId)) |>
-  ungroup() |>
   relocate(point_index, hit_count, x, y, z, position, pointEndType, player_hit, serverId, receiverId)
-trajectory_formatted_df
+print(n=50, trajectory_formatted_df)
 
 table(trajectory_formatted_df$pointEndType)
 
