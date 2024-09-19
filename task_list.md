@@ -1,5 +1,16 @@
 ## Task List
 
+### For September 26 (and maybe October 3)
+
+1. Get match score variable (sets, games, points for each player), either from the column that's in the data or from making it by hand.
+
+2. Make a separate tibble for net height at a grid of maybe 100 to 1000 y-values.
+
+    * can then use this tibble to join to the trajectory data and figure out the "height above net." 
+    
+3. With height above net, can start to look into net clearance for serves on important points.
+
+    
 ### For September 19
 
 1. Get player hit variable correct.
