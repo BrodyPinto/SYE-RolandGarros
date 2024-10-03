@@ -1,5 +1,14 @@
 ## Task List
 
+## For October 10
+
+1. Fix the score variable.
+
+2. Maybe adjust the match function to be able to pull in (and subsequently bind, with a match id) all matches for a player of interest.
+
+3. For a player of interest, start to make plots of perhaps their serve location and/or return location, colouring by whether or the point was "important" (was a break point, was a deuce point, was a tiebreak point, or some other "easy" metric of importance).
+
+
 ### For September 26 (and maybe October 3)
 
 1. Get match score variable (sets, games, points for each player), either from the column that's in the data or from making it by hand.
