@@ -1,5 +1,15 @@
 ## Task List
 
+## For October 24
+
+1. Create two functions that has the raw data as input and then output the cleaned data set with each row as one point and one function that takes the point cleaned data set and returns a cleaned data set with one row per shot.
+
+2. Maybe adjust the match function to be able to pull in (and subsequently bind, with a match id) all matches for a player of interest.
+
+3. Creating a "base plot" function that plots the tennis court background, lines, etc, taking no inputs and outputting a ggplot object.
+
+4. For a player of interest, start to make plots of perhaps their serve location and/or return location, colouring by whether or the point was "important" (was a break point, was a deuce point, was a tiebreak point, or some other "easy" metric of importance).
+
 ## For October 10
 
 1. Fix the score variable.
