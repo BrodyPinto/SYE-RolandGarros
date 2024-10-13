@@ -2,7 +2,7 @@
 
 ## For October 24
 
-1. Create two functions that has the raw data as input and then output the cleaned data set with each row as one point and one function that takes the point cleaned data set and returns a cleaned data set with one row per shot.
+1. Create two functions that have the raw data as input and then output the cleaned data set with each row as one point and one function that takes the point cleaned data set and returns a cleaned data set with one row per shot.
 
 2. Maybe adjust the match function to be able to pull in (and subsequently bind, with a match id) all matches for a player of interest.
 
