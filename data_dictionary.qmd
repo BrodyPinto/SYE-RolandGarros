@@ -88,7 +88,10 @@ table(trajectory_formatted_df$position)
 match_djokovic_alcaraz_semi2023 <- fetch_match_info(year = "2023", player_last = "Djokovic", round = "SF")
 test_match1 <- read_csv(here::here(paste0("data/", match_djokovic_alcaraz_semi2023)))
 
-formatted_df <- test_match1 |> mutate(point_index = row_number()) |>
+formatted_df <- nadal_2022 |> 
+  ## must use fetch_all_matches(player, year, round) function to get dataset with match_id variable
+  group_by(match_id) |>
+  mutate(point_index = row_number()) |>
   ## matchScore parsing:
   mutate(matchScore = sub("^.", "", matchScore)) |>
   mutate(matchScore = sub(".$", "", matchScore)) |>
@@ -169,7 +172,6 @@ formatted_df <- test_match1 |> mutate(point_index = row_number()) |>
   mutate(player2_game_lag = if_else(player2_game_lag == "GAME" | player2_game_lag == "GAME", 
                                     true = "0", 
                                     false = player2_game_lag)) |>
-  relocate(player1_game_lag, player2_game_lag, player1_game, player2_game, player1_set1, player2_set1, player1_set1_lag, player2_set1_lag) |>
   ## trajectoryData parsing:
   mutate(trajectoryData = sub("^..", "", trajectoryData)) |>
   mutate(trajectoryData = sub("..$", "", trajectoryData)) |>
@@ -190,11 +192,13 @@ formatted_df <- test_match1 |> mutate(point_index = row_number()) |>
   ## net_height and net_clearance variables:
   mutate(net_height = 0.00619 * (y^2) + 0.914) |>
   mutate(net_clearance = z - net_height) |>
-  relocate(point_index, hit_count, x, y, z, position, pointEndType, player_hit, net_height, net_clearance,
-           player1_game_lag, player2_game_lag, player1_set1_lag, player2_set1_lag, player1_set2_lag, player2_set2_lag,
-           player1_set3_lag, player2_set3_lag, player1_set4_lag, player2_set4_lag, player1_set5_lag, player2_set5_lag)
+  relocate(match_id, point_index, player1_game, player2_game, player1_game_lag, player2_game_lag, player1_set1, player2_set1)
 
-print(n=100, formatted_df)
+## TODO: trouble on line 883 - need to figure out what's going on with AD
+print(n=1000, formatted_df)
+
+## looks like grouping by match_id works well
+View(formatted_df)
 ```
 
 ## Net Height Table (for `net_clearance` variable)

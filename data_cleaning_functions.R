@@ -1,7 +1,10 @@
 library(tidyverse)
+
 ## function for cleaning the data to the POINT level of granularity:
 tidy_point_level <- function(raw_data) {
-  formatted_point_level <- raw_data |> mutate(point_index = row_number()) |>
+  formatted_point_level <- raw_data |> 
+    ## TODO: group by match_id
+    mutate(point_index = row_number()) |>
     ## matchScore parsing:
     mutate(matchScore = sub("^.", "", matchScore)) |>
     mutate(matchScore = sub(".$", "", matchScore)) |>
@@ -77,11 +80,11 @@ tidy_point_level <- function(raw_data) {
            player2_set4 = lag(player2_set4, default = 0),
            player2_set5 = lag(player2_set5, default = 0)) |>
     mutate(player1_game = if_else(player1_game == "GAME" | player2_game == "GAME", 
-                                      true = "0", 
-                                      false = player1_game)) |>
+                                  true = "0", 
+                                  false = player1_game)) |>
     mutate(player2_game = if_else(player2_game == "GAME" | player2_game == "GAME", 
-                                      true = "0", 
-                                      false = player2_game)) |>
+                                  true = "0", 
+                                  false = player2_game)) |>
     relocate(player1_game, player2_game, player1_set1, player2_set1)
   
   return(formatted_point_level)
@@ -89,7 +92,9 @@ tidy_point_level <- function(raw_data) {
 
 ## function for cleaning the data to the SHOT level of granularity:
 tidy_shot_level <- function(raw_data) {
-  formatted_shot_level <- raw_data |> mutate(point_index = row_number()) |>
+  formatted_shot_level <- raw_data |> 
+    ## TODO: group by match_id
+    mutate(point_index = row_number()) |>
     ## matchScore parsing:
     mutate(matchScore = sub("^.", "", matchScore)) |>
     mutate(matchScore = sub(".$", "", matchScore)) |>
@@ -197,10 +202,9 @@ tidy_shot_level <- function(raw_data) {
   return(formatted_shot_level)
 }
 
+## isn't working right, look at row 11
 View(tidy_point_level(test_match1))
 View(tidy_shot_level(test_match1))
-
-
 
 
 
