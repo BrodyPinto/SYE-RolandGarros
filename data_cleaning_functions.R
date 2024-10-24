@@ -1,5 +1,7 @@
 library(tidyverse)
 
+## TODO: update these with working code from data_dictionary
+
 ## function for cleaning the data to the POINT level of granularity:
 tidy_point_level <- function(raw_data) {
   formatted_point_level <- raw_data |> 
