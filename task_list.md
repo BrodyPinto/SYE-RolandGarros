@@ -1,5 +1,13 @@
 ## Task List
 
+## For October 31
+
+1. For a player of interest, start to make plots of perhaps their serve location and/or return location, colouring by whether or the point was "important" (was a break point, was a deuce point, was a tiebreak point, or some other "easy" metric of importance).
+
+2. Add the file string as a variable in the data set and parse to get player names, round, year.
+
+3. For Nadal, looking at his play through time. 
+
 ## For October 24
 
 1. Create two functions that have the raw data as input and then output the cleaned data set with each row as one point and one function that takes the point cleaned data set and returns a cleaned data set with one row per shot.
