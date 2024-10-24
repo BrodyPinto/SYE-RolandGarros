@@ -8,3 +8,7 @@ nadal_2021 <- fetch_all_matches(year = 2021, player = "Nadal")
 View(tidy_point_level(nadal_2022))
 View(tidy_shot_level(nadal_2022))
 
+fetch_match_info(player_last = "Nadal")
+
+
+

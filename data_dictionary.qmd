@@ -87,6 +87,8 @@ table(trajectory_formatted_df$position)
 ## looks like Alcaraz is player1 and Djokovic is player2 - not sure how this is determined yet?
 test_match1 <- fetch_all_matches(year = "2023", player = "Djokovic", round = "SF")
 
+fetch_match_info(year = "2023", player = "Djokovic", round = "SF")
+
 formatted_df <- test_match1 |> 
   ## must use fetch_all_matches(player, year, round) function to get dataset with match_id variable
   group_by(match_id) |>
@@ -265,17 +267,17 @@ test_match1 |>
          player2_game = sub(".$", "", player2_game)) |>
   ## lag the game score to get accurate game score:
   mutate(player1_game_lag = lag(player1_game, default = "0"),
-         player2_game_lag = lag(player2_game, default = "0")) |>
-         # player1_set1 = lag(player1_set1, default = 0),
-         # player1_set2 = lag(player1_set2, default = 0),
-         # player1_set3 = lag(player1_set3, default = 0),
-         # player1_set4 = lag(player1_set4, default = 0),
-         # player1_set5 = lag(player1_set5, default = 0),
-         # player2_set1 = lag(player2_set1, default = 0),
-         # player2_set2 = lag(player2_set2, default = 0),
-         # player2_set3 = lag(player2_set3, default = 0),
-         # player2_set4 = lag(player2_set4, default = 0),
-         # player2_set5 = lag(player2_set5, default = 0)) |> 
+         player2_game_lag = lag(player2_game, default = "0"),
+         player1_set1 = lag(player1_set1, default = 0),
+         player1_set2 = lag(player1_set2, default = 0),
+         player1_set3 = lag(player1_set3, default = 0),
+         player1_set4 = lag(player1_set4, default = 0),
+         player1_set5 = lag(player1_set5, default = 0),
+         player2_set1 = lag(player2_set1, default = 0),
+         player2_set2 = lag(player2_set2, default = 0),
+         player2_set3 = lag(player2_set3, default = 0),
+         player2_set4 = lag(player2_set4, default = 0),
+         player2_set5 = lag(player2_set5, default = 0)) |>
   mutate(player1_game_score = if_else(player1_game_lag == "GAME" | player2_game_lag == "GAME", 
                                     true = "0", 
                                     false = player1_game_lag)) |>
@@ -371,25 +373,23 @@ test_match1 |>
          player2_game = sub(".$", "", player2_game)) |>
   ## lag the game score to get accurate game score:
   mutate(player1_game_lag = lag(player1_game, default = "0"),
-         player2_game_lag = lag(player2_game, default = "0")) |>
-         # player1_set1 = lag(player1_set1, default = 0),
-         # player1_set2 = lag(player1_set2, default = 0),
-         # player1_set3 = lag(player1_set3, default = 0),
-         # player1_set4 = lag(player1_set4, default = 0),
-         # player1_set5 = lag(player1_set5, default = 0),
-         # player2_set1 = lag(player2_set1, default = 0),
-         # player2_set2 = lag(player2_set2, default = 0),
-         # player2_set3 = lag(player2_set3, default = 0),
-         # player2_set4 = lag(player2_set4, default = 0),
-         # player2_set5 = lag(player2_set5, default = 0)) |> 
+         player2_game_lag = lag(player2_game, default = "0"),
+         player1_set1 = lag(player1_set1, default = 0),
+         player1_set2 = lag(player1_set2, default = 0),
+         player1_set3 = lag(player1_set3, default = 0),
+         player1_set4 = lag(player1_set4, default = 0),
+         player1_set5 = lag(player1_set5, default = 0),
+         player2_set1 = lag(player2_set1, default = 0),
+         player2_set2 = lag(player2_set2, default = 0),
+         player2_set3 = lag(player2_set3, default = 0),
+         player2_set4 = lag(player2_set4, default = 0),
+         player2_set5 = lag(player2_set5, default = 0)) |>
   mutate(player1_game_score = if_else(player1_game_lag == "GAME" | player2_game_lag == "GAME", 
                                     true = "0", 
                                     false = player1_game_lag)) |>
   mutate(player2_game_score = if_else(player1_game_lag == "GAME" | player2_game_lag == "GAME", 
                                     true = "0", 
                                     false = player2_game_lag)) |>
-  ## TODO: fix this
-  #separate_wider_delim(pointId, delim = "_", names = c("set", "game", "point", "serve")) |>
   ## get the first numeric value from pointId whose format is: set_game_point_serve
   mutate(set = parse_number(pointId)) |>
   mutate(player1_set_score = case_when(set == 1 ~ player1_set1,
@@ -442,6 +442,8 @@ formatted_df |> filter(position == 'bounce') |>
   summarise(max_x = max(x),
             max_y = max(y),
             max_z = max(z))
+
+draw_court()
 ```
 
 ```{r}
