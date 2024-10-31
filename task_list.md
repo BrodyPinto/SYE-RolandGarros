@@ -1,5 +1,19 @@
 ## Task List
 
+## For November 7
+
+1. For a player of interest, start to make plots of perhaps their serve location and/or return location, colouring by whether or the point was "important" (was a break point, was a deuce point, was a tiebreak point, or some other "easy" metric of importance).
+
+2. Parse to get player names, round, year.
+
+3. For Nadal, looking at his play through time. 
+
+4. Think through how to get a particular player as "Player 1" for an entire set of matches. 
+
+5. MH: Look at player_id in data Ben used.
+
+6. MH: Refresh on how to start an R package (especially if it's possible to do it with an existing repository).
+
 ## For October 31
 
 1. For a player of interest, start to make plots of perhaps their serve location and/or return location, colouring by whether or the point was "important" (was a break point, was a deuce point, was a tiebreak point, or some other "easy" metric of importance).
