@@ -22,9 +22,11 @@ fetch_all_matches <- function(player = "(.|\\s)*\\S(.|\\s)*",
   ## add a match_id variable to all matches in matches_of_interest
   list_of_matches <- lapply(seq_along(matches_of_interest), function(i) {
     
-    df <- read_csv(here::here(paste0("data/", matches_of_interest[i])))
+    file_name <- matches_of_interest[i]
+    df <- read_csv(here::here(paste0("data/", file_name)))
     df <- df |> mutate(match_id = paste0(i)) |>
-      relocate(match_id)
+      mutate(match_info = file_name) |>
+      relocate(match_id, match_info)
     
     return(df)
   })
@@ -35,7 +37,7 @@ fetch_all_matches <- function(player = "(.|\\s)*\\S(.|\\s)*",
   return(combined_df)
 }
 
-federer_df <- fetch_all_matches(player = "Federer")
+federer_df <- fetch_all_matches(player = "Federer") |> View()
 nadal_df <- fetch_all_matches(player = "Nadal")
 djokovic_df <- fetch_all_matches(player = "Djokovic")
 

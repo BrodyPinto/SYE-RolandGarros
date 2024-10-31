@@ -5,7 +5,8 @@ library(tidyverse)
 ## function for cleaning the data to the POINT level of granularity:
 tidy_point_level <- function(raw_data) {
   formatted_point_level <- raw_data |> 
-    ## TODO: group by match_id
+    ## must use fetch_all_matches(player, year, round) function to get dataset with match_id variable
+    group_by(match_id) |>
     mutate(point_index = row_number()) |>
     ## matchScore parsing:
     mutate(matchScore = sub("^.", "", matchScore)) |>
@@ -69,8 +70,8 @@ tidy_point_level <- function(raw_data) {
            player2_game = sub("^.", "", player2_game),
            player2_game = sub(".$", "", player2_game)) |>
     ## lag the game score to get accurate game score:
-    mutate(player1_game = lag(player1_game, default = "0"),
-           player2_game = lag(player2_game, default = "0"),
+    mutate(player1_game_lag = lag(player1_game, default = "0"),
+           player2_game_lag = lag(player2_game, default = "0"),
            player1_set1 = lag(player1_set1, default = 0),
            player1_set2 = lag(player1_set2, default = 0),
            player1_set3 = lag(player1_set3, default = 0),
@@ -81,13 +82,25 @@ tidy_point_level <- function(raw_data) {
            player2_set3 = lag(player2_set3, default = 0),
            player2_set4 = lag(player2_set4, default = 0),
            player2_set5 = lag(player2_set5, default = 0)) |>
-    mutate(player1_game = if_else(player1_game == "GAME" | player2_game == "GAME", 
-                                  true = "0", 
-                                  false = player1_game)) |>
-    mutate(player2_game = if_else(player2_game == "GAME" | player2_game == "GAME", 
-                                  true = "0", 
-                                  false = player2_game)) |>
-    relocate(player1_game, player2_game, player1_set1, player2_set1)
+    mutate(player1_game_score = if_else(player1_game_lag == "GAME" | player2_game_lag == "GAME", 
+                                        true = "0", 
+                                        false = player1_game_lag)) |>
+    mutate(player2_game_score = if_else(player1_game_lag == "GAME" | player2_game_lag == "GAME", 
+                                        true = "0", 
+                                        false = player2_game_lag)) |>
+    ## get the first numeric value from pointId whose format is: set_game_point_serve
+    mutate(set = parse_number(pointId)) |>
+    mutate(player1_set_score = case_when(set == 1 ~ player1_set1,
+                                         set == 2 ~ player1_set2,
+                                         set == 3 ~ player1_set3,
+                                         set == 4 ~ player1_set4,
+                                         set == 5 ~ player1_set5)) |>
+    mutate(player2_set_score = case_when(set == 1 ~ player2_set1,
+                                         set == 2 ~ player2_set2,
+                                         set == 3 ~ player2_set3,
+                                         set == 4 ~ player2_set4,
+                                         set == 5 ~ player2_set5)) |>
+    relocate(set, player1_game_score, player2_game_score, player1_set_score, player2_set_score)
   
   return(formatted_point_level)
 }
@@ -95,7 +108,8 @@ tidy_point_level <- function(raw_data) {
 ## function for cleaning the data to the SHOT level of granularity:
 tidy_shot_level <- function(raw_data) {
   formatted_shot_level <- raw_data |> 
-    ## TODO: group by match_id
+    ## must use fetch_all_matches(player, year, round) function to get dataset with match_id variable
+    group_by(match_id) |>
     mutate(point_index = row_number()) |>
     ## matchScore parsing:
     mutate(matchScore = sub("^.", "", matchScore)) |>
@@ -159,8 +173,8 @@ tidy_shot_level <- function(raw_data) {
            player2_game = sub("^.", "", player2_game),
            player2_game = sub(".$", "", player2_game)) |>
     ## lag the game score to get accurate game score:
-    mutate(player1_game = lag(player1_game, default = "0"),
-           player2_game = lag(player2_game, default = "0"),
+    mutate(player1_game_lag = lag(player1_game, default = "0"),
+           player2_game_lag = lag(player2_game, default = "0"),
            player1_set1 = lag(player1_set1, default = 0),
            player1_set2 = lag(player1_set2, default = 0),
            player1_set3 = lag(player1_set3, default = 0),
@@ -171,12 +185,24 @@ tidy_shot_level <- function(raw_data) {
            player2_set3 = lag(player2_set3, default = 0),
            player2_set4 = lag(player2_set4, default = 0),
            player2_set5 = lag(player2_set5, default = 0)) |>
-    mutate(player1_game = if_else(player1_game == "GAME" | player2_game == "GAME", 
-                                  true = "0", 
-                                  false = player1_game)) |>
-    mutate(player2_game = if_else(player2_game == "GAME" | player2_game == "GAME", 
-                                  true = "0", 
-                                  false = player2_game)) |>
+    mutate(player1_game_score = if_else(player1_game_lag == "GAME" | player2_game_lag == "GAME", 
+                                        true = "0", 
+                                        false = player1_game_lag)) |>
+    mutate(player2_game_score = if_else(player1_game_lag == "GAME" | player2_game_lag == "GAME", 
+                                        true = "0", 
+                                        false = player2_game_lag)) |>
+    ## get the first numeric value from pointId whose format is: set_game_point_serve
+    mutate(set = parse_number(pointId)) |>
+    mutate(player1_set_score = case_when(set == 1 ~ player1_set1,
+                                         set == 2 ~ player1_set2,
+                                         set == 3 ~ player1_set3,
+                                         set == 4 ~ player1_set4,
+                                         set == 5 ~ player1_set5)) |>
+    mutate(player2_set_score = case_when(set == 1 ~ player2_set1,
+                                         set == 2 ~ player2_set2,
+                                         set == 3 ~ player2_set3,
+                                         set == 4 ~ player2_set4,
+                                         set == 5 ~ player2_set5)) |>
     ## trajectoryData parsing:
     mutate(trajectoryData = sub("^..", "", trajectoryData)) |>
     mutate(trajectoryData = sub("..$", "", trajectoryData)) |>
@@ -197,16 +223,10 @@ tidy_shot_level <- function(raw_data) {
     ## net_height and net_clearance variables:
     mutate(net_height = 0.00619 * (y^2) + 0.914) |>
     mutate(net_clearance = z - net_height) |>
-    relocate(point_index, hit_count, x, y, z, position, pointEndType, player_hit, net_height, net_clearance,
-             player1_game, player2_game, player1_set1, player2_set1, player1_set2, player2_set2,
-             player1_set3, player2_set3, player1_set4, player2_set4, player1_set5, player2_set5)
+    relocate(match_id, set, player1_game_score, player2_game_score, player1_set_score, player2_set_score, x, y, z, position)
   
   return(formatted_shot_level)
 }
-
-## isn't working right, look at row 11
-View(tidy_point_level(test_match1))
-View(tidy_shot_level(test_match1))
 
 
 

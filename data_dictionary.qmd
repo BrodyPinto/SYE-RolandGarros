@@ -298,7 +298,7 @@ test_match1 |>
                                        set == 3 ~ player2_set3,
                                        set == 4 ~ player2_set4,
                                        set == 5 ~ player2_set5)) |>
-  relocate(set, player1_game_score, player2_game_score, player1_set_score, player2_set_score, player1_set1, player2_set1, player1_set4, player2_set4) |>
+  relocate(set, player1_game_score, player2_game_score, player1_set_score, player2_set_score) |>
   View()
 
 ## looks pretty good - removing the lag on the set variables fixes the issue of the first set ending at 3-5 instead of 3-6, but lags it back within the set (can we have it both ways or is this the best we can do?)

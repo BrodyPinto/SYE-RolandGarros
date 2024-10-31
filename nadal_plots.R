@@ -8,7 +8,9 @@ nadal_2021 <- fetch_all_matches(year = 2021, player = "Nadal")
 View(tidy_point_level(nadal_2022))
 View(tidy_shot_level(nadal_2022))
 
+## need to find a way to parse player1, player2, round, and year (ChatGPT?)
 fetch_match_info(player_last = "Nadal")
+fetch_match_info(player_last = "Federer")
 
 
 
