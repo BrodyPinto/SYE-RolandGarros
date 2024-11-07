@@ -1,5 +1,19 @@
 ## Task List
 
+## November 14
+
+1. Document all functions in package.
+
+2. Get necessary imports.
+
+3. Think through how to get a particular player as "Player 1" for an entire set of matches. 
+
+4. MH: think more about .rda files (one vs. many).
+
+5. For a player of interest, start to make plots of perhaps their serve location and/or return location, colouring by whether or the point was "important" (was a break point, was a deuce point, was a tiebreak point, or some other "easy" metric of importance).
+
+6. For Nadal, looking at his play through time. 
+
 ## For November 7
 
 1. For a player of interest, start to make plots of perhaps their serve location and/or return location, colouring by whether or the point was "important" (was a break point, was a deuce point, was a tiebreak point, or some other "easy" metric of importance).
