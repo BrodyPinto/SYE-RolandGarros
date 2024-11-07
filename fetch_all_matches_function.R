@@ -37,7 +37,7 @@ fetch_all_matches <- function(player = "(.|\\s)*\\S(.|\\s)*",
   return(combined_df)
 }
 
-federer_df <- fetch_all_matches(player = "Federer") |> View()
+federer_df <- fetch_all_matches(player = "Federer")
 nadal_df <- fetch_all_matches(player = "Nadal")
 djokovic_df <- fetch_all_matches(player = "Djokovic")
 

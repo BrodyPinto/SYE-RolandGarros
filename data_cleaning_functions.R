@@ -1,12 +1,15 @@
 library(tidyverse)
 
-## TODO: update these with working code from data_dictionary
-
 ## function for cleaning the data to the POINT level of granularity:
 tidy_point_level <- function(raw_data) {
   formatted_point_level <- raw_data |> 
     ## must use fetch_all_matches(player, year, round) function to get dataset with match_id variable
     group_by(match_id) |>
+    ## match_info parsing:
+    separate(match_info, into = c("label", "round", "opponents", "year", "court_number", "file_ending"), sep = "_") |>
+    separate(opponents, into = c("player1", "player2"), sep = "-vs-") |>
+    mutate(player1 = sub("-", " ", player1),
+           player2 = sub("-", " ", player2)) |>
     mutate(point_index = row_number()) |>
     ## matchScore parsing:
     mutate(matchScore = sub("^.", "", matchScore)) |>
@@ -110,6 +113,11 @@ tidy_shot_level <- function(raw_data) {
   formatted_shot_level <- raw_data |> 
     ## must use fetch_all_matches(player, year, round) function to get dataset with match_id variable
     group_by(match_id) |>
+    ## match_info parsing:
+    separate(match_info, into = c("label", "round", "opponents", "year", "court_number", "file_ending"), sep = "_") |>
+    separate(opponents, into = c("player1", "player2"), sep = "-vs-") |>
+    mutate(player1 = sub("-", " ", player1),
+           player2 = sub("-", " ", player2)) |>
     mutate(point_index = row_number()) |>
     ## matchScore parsing:
     mutate(matchScore = sub("^.", "", matchScore)) |>

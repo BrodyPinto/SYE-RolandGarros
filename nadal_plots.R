@@ -11,6 +11,7 @@ View(tidy_shot_level(nadal_2022))
 ## need to find a way to parse player1, player2, round, and year (ChatGPT?)
 fetch_match_info(player_last = "Nadal")
 fetch_match_info(player_last = "Federer")
+fetch_match_info(player_last = "Djokovic")
 
 
 
