@@ -84,6 +84,9 @@ table(trajectory_formatted_df$position)
 ```{r}
 ## Test match: Novak Djokovic (player_id = 9801) won the 2023 French Open semifinal against Carlos Alcaraz (player_id = 44408). Djokovic defeated Alcaraz in four sets, with a score of 6-3, 5-7, 6-1, 6-1. The match took a significant turn in the third set when Alcaraz began to suffer from cramps, which greatly affected his movement and performance. Djokovic served first at the start of the match.
 
+RG_players_2022 <- read_csv("player_ids/RG_players_2022.csv")
+View(RG_players_2022)
+
 ## looks like Alcaraz is player1 and Djokovic is player2 - not sure how this is determined yet?
 test_match1 <- fetch_all_matches(year = "2023", player = "Djokovic", round = "SF")
 
@@ -196,6 +199,20 @@ formatted_df <- test_match1 |>
   relocate(match_id, point_index, player1_game, player2_game, player1_set1, player2_set1)
 
 View(formatted_df)
+
+tidy_shot_level(test_match1) |> 
+  relocate(x, y, z, position, player_hit) |>
+  View()
+
+test_match1 |>
+  ## must use fetch_all_matches(player, year, round) function to get dataset with match_id variable
+  group_by(match_id) |>
+  separate(match_info, into = c("label", "round", "opponents", "year", "court_number", "file_ending"), sep = "_") |>
+  separate(opponents, into = c("player1", "player2"), sep = "-vs-") |>
+  mutate(player1 = sub("-", " ", player1),
+         player2 = sub("-", " ", player2))
+
+tidy_point_level(nadal_df) |> View()
 ```
 
 ## Point Level of Granularity
