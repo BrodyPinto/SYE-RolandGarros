@@ -1,5 +1,15 @@
 ## Task List
 
+## November 21
+
+1. Think through how to get a particular player as "Player 1" for an entire set of matches. 
+
+2. Is there an issue with the score and who is player1 vs. who is player2?
+
+3. For a player of interest, start to make plots of perhaps their serve location and/or return location, colouring by whether or the point was "important" (was a break point, was a deuce point, was a tiebreak point, or some other "easy" metric of importance).
+
+4. For Nadal, looking at his play through time. 
+
 ## November 14
 
 1. Document all functions in package.
