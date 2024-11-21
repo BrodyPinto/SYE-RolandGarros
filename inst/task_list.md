@@ -1,5 +1,19 @@
 ## Task List
 
+## December 5
+
+1. Fix score issues (second serves and tiebreak scores).
+
+2. Fix the 13 matches.
+
+3. Replace player ID's with their names.
+
+4. Think through how to get a particular player as "Player 1" for an entire set of matches. 
+
+5. For a player of interest, start to make plots of perhaps their serve location and/or return location, colouring by whether or the point was "important" (was a break point, was a deuce point, was a tiebreak point, or some other "easy" metric of importance).
+
+6. For Nadal, looking at his play through time. 
+
 ## November 21
 
 1. Think through how to get a particular player as "Player 1" for an entire set of matches. 
