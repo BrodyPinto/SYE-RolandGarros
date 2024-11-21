@@ -132,33 +132,27 @@ clean_point_level <- function(raw_data, player_of_interest = "(.|\\s)*\\S(.|\\s)
     mutate(
       player1 = case_when(
         str_detect(str_to_lower(original_player1), player_of_interest) ~ original_player1,
-        str_detect(str_to_lower(original_player2), player_of_interest) ~ original_player2,
-        TRUE ~ original_player1  # Default to original player1 if neither matches
+        str_detect(str_to_lower(original_player2), player_of_interest) ~ original_player2
       ),
       player2 = case_when(
         str_detect(str_to_lower(original_player1), player_of_interest) ~ original_player2,
-        str_detect(str_to_lower(original_player2), player_of_interest) ~ original_player1,
-        TRUE ~ original_player2  # Default to original player2 if neither matches
+        str_detect(str_to_lower(original_player2), player_of_interest) ~ original_player1
       ),
       player1_game_score = case_when(
         str_detect(str_to_lower(original_player1), player_of_interest) ~ original_player1_game_score,
-        str_detect(str_to_lower(original_player2), player_of_interest) ~ original_player2_game_score,
-        TRUE ~ original_player1_game_score  # Default to original player1_game_score if neither matches
+        str_detect(str_to_lower(original_player2), player_of_interest) ~ original_player2_game_score
       ),
       player2_game_score = case_when(
         str_detect(str_to_lower(original_player1), player_of_interest) ~ original_player2_game_score,
-        str_detect(str_to_lower(original_player2), player_of_interest) ~ original_player1_game_score,
-        TRUE ~ original_player2_game_score  # Default to original player2_game_score if neither matches
+        str_detect(str_to_lower(original_player2), player_of_interest) ~ original_player1_game_score
       ),
       player1_set_score = case_when(
         str_detect(str_to_lower(original_player1), player_of_interest) ~ original_player1_set_score,
-        str_detect(str_to_lower(original_player2), player_of_interest) ~ original_player2_set_score,
-        TRUE ~ original_player1_set_score  # Default to original player1_set_score if neither matches
+        str_detect(str_to_lower(original_player2), player_of_interest) ~ original_player2_set_score
       ),
       player2_set_score = case_when(
         str_detect(str_to_lower(original_player1), player_of_interest) ~ original_player2_set_score,
-        str_detect(str_to_lower(original_player2), player_of_interest) ~ original_player1_set_score,
-        TRUE ~ original_player2_set_score  # Default to original player2_set_score if neither matches
+        str_detect(str_to_lower(original_player2), player_of_interest) ~ original_player1_set_score
       )
     ) |>
     relocate(set, player1_game_score, player2_game_score, player1_set_score, player2_set_score, player1, player2)

@@ -90,11 +90,14 @@ View(RG_players_2022)
 ## looks like Alcaraz is player1 and Djokovic is player2 - not sure how this is determined yet?
 test_match1 <- fetch_all_matches(year = "2023", player = "Djokovic", round = "SF")
 
-fetch_match_info(year = "2022", player = "nadal", round = "F")
+fetch_match_info(year = "2022", player = "nadal")
 fetch_all_matches(year = "2022", player = "nadal", round = "F")
 
 clean_point_level(test_match1, player_of_interest = "djokovic") |> View()
 clean_point_level(nadal_2022, player_of_interest = "nadal") |> View()
+
+djok_2021 <- fetch_all_matches(year = "2021", player = "djokovic")
+clean_point_level(djok_2021, player_of_interest = "djokovic") |> View()
 
 formatted_df <- test_match1 |> 
   ## must use fetch_all_matches(player, year, round) function to get dataset with match_id variable
