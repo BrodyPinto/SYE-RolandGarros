@@ -1,6 +1,15 @@
-library(ggplot2)
+#' Draw Court
+#'
+#' This is a function that draws the tennis court (dimensions are to scale)
+#'
+#' @return a ggplot object with solid lines representing the lines on the tennis court, dashed line represents the net
+#'
+#' @examples
+#' draw_court()
+#'
+#' @import tidyverse
+#' @export
 
-## draw_court function
 draw_court <- function() {
   court <- ggplot() +
     annotate(geom = "segment", y = 5.02, yend = 5.02, x = -11.88, xend = 11.88, alpha = 0.5) +
@@ -20,6 +29,6 @@ draw_court <- function() {
     annotate(geom = "segment", y = 0, yend = 0, x = 11.88, xend = 11.6, alpha = 0.5) +
     theme_void() +
     coord_fixed()
-  
+
   return(court)
 }

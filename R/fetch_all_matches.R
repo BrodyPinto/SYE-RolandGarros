@@ -39,13 +39,16 @@ fetch_all_matches <- function(player = "(.|\\s)*\\S(.|\\s)*",
     df <- read_csv(here::here(paste0("inst/data/", file_name)))
     df <- df |> mutate(match_id = paste0(i)) |>
       mutate(match_info = file_name) |>
+      mutate(match_id = as.numeric(match_id)) |>
       relocate(match_id, match_info)
 
     return(df)
   })
 
-  ## combine all data frames into a single data frame
-  combined_df <- bind_rows(list_of_matches)
+  # ## combine all data frames into a single data frame
+  # combined_df <- bind_rows(list_of_matches)
 
-  return(combined_df)
+  return(list_of_matches)
 }
+
+nadal_2022 = fetch_all_matches(player = "Nadal", year = 2022)

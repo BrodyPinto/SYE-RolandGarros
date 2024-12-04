@@ -4,7 +4,7 @@
 
 1. Fix score issues (second serves and tiebreak scores).
 
-2. Fix the 13 matches.
+2. Fix the 13 matches (directly in the file names).
 
 3. Replace player ID's with their names.
 

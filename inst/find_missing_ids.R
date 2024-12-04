@@ -66,6 +66,8 @@ winners_by_last_point <- has_score_df |>
   select(round, scorer_firstName, scorer_lastName)
 winners_by_last_point |> print(n = Inf)
 
+View(winners_by_last_point)
+
 ## who won the match,
 ## according to who had the higher score at the final point of the match
 winners_by_score <- has_score_df |> slice(n()) |>
@@ -86,7 +88,7 @@ winners_by_score <- has_score_df |> slice(n()) |>
 winners_by_score |> print(n = Inf)
 
 bind_cols(winners_by_last_point, winners_by_score) |>
-  print(n = Inf)
+  View()
 ## p1/p2 order correct for 140 matches, incorrect for 11 matches, nearly all of which have
 ## hyphenated or a space in their first or last name
 

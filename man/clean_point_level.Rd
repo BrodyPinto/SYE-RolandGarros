@@ -4,10 +4,12 @@
 \alias{clean_point_level}
 \title{Clean Point Level}
 \usage{
-clean_point_level(raw_data)
+clean_point_level(raw_data, player_of_interest = "(.|\\\\s)*\\\\S(.|\\\\s)*")
 }
 \arguments{
 \item{raw_data}{is a data frame of the raw Court Vision data (must be output from the fetch_all_matches function)}
+
+\item{player_of_interest}{is a string of the player's name we want as player1 - first or last name (case insensitive)}
 }
 \value{
 a data frame with a row for each point played in the match/matches of interest
