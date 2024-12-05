@@ -1,5 +1,17 @@
 ## Task List
 
+## December 12
+
+1. Fix the 13 matches (directly in the file names).
+
+2. Replace player ID's with their names (three joins).
+
+3. Modify clean_shot_level to take in the clean_and_combine_point output.
+
+4. For a player of interest, start to make plots of perhaps their serve location and/or return location, colouring by whether or the point was "important" (was a break point, was a deuce point, was a tiebreak point, or some other "easy" metric of importance).
+
+5. For Nadal, looking at his play through time. 
+
 ## December 5
 
 1. Fix score issues (second serves and tiebreak scores).
