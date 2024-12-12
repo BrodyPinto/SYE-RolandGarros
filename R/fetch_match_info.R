@@ -1,4 +1,4 @@
-#' Fetch Match Info
+#' Fetch Match Info Function
 #'
 #' This is a function that fetches all matches that match the player, year, and/or round of interest.
 #'

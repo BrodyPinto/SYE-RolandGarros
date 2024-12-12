@@ -2,7 +2,7 @@
 #'
 #' This is a function that draws the tennis court (dimensions are to scale)
 #'
-#' @return a ggplot object with solid lines representing the lines on the tennis court, dashed line represents the net
+#' @return returns a ggplot object with solid lines representing the lines on the tennis court, dashed line represents the net
 #'
 #' @examples
 #' draw_court()

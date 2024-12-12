@@ -2,7 +2,7 @@
 % Please edit documentation in R/fetch_all_matches.R
 \name{fetch_all_matches}
 \alias{fetch_all_matches}
-\title{Fetch All Matches}
+\title{Fetch All Matches Function}
 \usage{
 fetch_all_matches(
   player = "(.|\\\\s)*\\\\S(.|\\\\s)*",
@@ -18,10 +18,10 @@ fetch_all_matches(
 \item{round}{is a string of the round the match was played - F, SF, QF, R16, R32, R64, or R128}
 }
 \value{
-a data frame of all matches that match the player, year, and/or round of interest
+returns a list of data frames (raw data frames of individual matches) that match the player, year, and/or round of interest
 }
 \description{
-This is a function that collects and binds all matches that match the player, year, and/or round of interest.
+This is a function that collects all data frames of matches that match the player, year, and/or round of interest.
 }
 \examples{
 fetch_all_matches(player = "Nadal", year = "2022", round = "F") ## fetches the 2022 French Open final match that Nadal played

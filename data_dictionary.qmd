@@ -997,7 +997,82 @@ formatted_shot_level |> View()
   View()
 ```
 
+```{r}
+## Important test code:
+nadal_2022 <- fetch_all_matches(player = "Nadal", year = 2022)
+nadal_2022_cleaned <- clean_and_combine(nadal_2022, player_interest = "Nadal")
+clean_and_combine_point(test_match_steph_final) |> View()
+clean_and_combine_point(all_matches_2022) |> View()
 
+nadal_final_2022 <- fetch_all_matches(player = "Nadal", year = "2022", round = "F") # returns a list of data frames
+clean_point_level(nadal_final_2022[[1]]) # this function takes in one data frame (a single match)
+
+## Player names for binding:
+all_players <- bind_rows(read_csv(here::here("inst/player_ids/RG_players_2019.csv")),
+                         read_csv(here::here("inst/player_ids/RG_players_2020.csv")),
+                         read_csv(here::here("inst/player_ids/RG_players_2021.csv")),
+                         read_csv(here::here("inst/player_ids/RG_players_2022.csv")),
+                         read_csv(here::here("inst/player_ids/RG_players_2023.csv"))) |>
+  distinct(id, .keep_all = TRUE) |>
+  select(id, firstName, lastName)
+
+players_to_add <- tibble(id = c(31132, 43970, 31976, 42340,
+                                18005, 30524, 9525, 42560,
+                                11713, 42559, 12105, 32390,
+                                33597, 34635),
+                         firstName = c("Andrey", "Holger", "Hubert", "Lorenzo",
+                                       "Camila", "Fiona", "Gael", "Qinwen",
+                                       "Juan Martin", "Elina", "Leonardo", "Sebastian",
+                                       "Mikael", "Zdenek"),
+                         lastName = c("RUBLEV", "RUNE", "HURKACZ", "MUSETTI",
+                                      "GIORGI", "FERRO", "MONFILS", "ZHENG",
+                                      "DEL POTRO", "AVANESYAN", "MAYER", "OFNER",
+                                      "YMER", "KOLAR"))
+all_players <- bind_rows(all_players, players_to_add) |>
+  mutate(lastName = str_to_title(lastName)) |>
+  mutate(fullName = paste(firstName, lastName))
+
+nadal_2022_cleaned |>
+  left_join(all_players, by = c("serverId" = "id")) |>
+  mutate(serverId = fullName) |>
+  select(-fullName) |>
+  left_join(all_players, by = c("scorerId" = "id")) |>
+  mutate(scorerId = fullName) |>
+  select(-fullName) |>
+  left_join(all_players, by = c("receiverId" = "id")) |>
+  mutate(receiverId = fullName) |>
+  View()
+```
+
+```{r}
+## trajectory parsing on cleaned and combined df
+nadal_2022_cleaned |> 
+  ## trajectoryData parsing:
+  mutate(trajectoryData = sub("^..", "", trajectoryData)) |>
+  mutate(trajectoryData = sub("..$", "", trajectoryData)) |>
+  separate_longer_delim(trajectoryData, delim = "}, {") |>
+  group_by(point_index) |>
+  mutate(shot_index = row_number()) |>
+  separate(trajectoryData, into = c("x", "y", "z", "position"), sep = "\\,") |>
+  mutate(x = parse_number(x),
+         y = parse_number(y),
+         z = parse_number(z),
+         position = sub("^.............", "", position)) |>
+  mutate(position = gsub("'", "", position)) |>
+  ## player_hit variable construction:
+  mutate(is_hit = if_else(position == "hit", true = 1, false = 0)) |>
+  group_by(point_index) |>
+  mutate(hit_count = cumsum(is_hit)) |>
+  mutate(player_hit = if_else(hit_count %% 2 == 1, serverId, receiverId)) |>
+  ## net_height and net_clearance variables:
+  mutate(net_height = 0.00619 * (y^2) + 0.914) |>
+  mutate(net_clearance = z - net_height) |>
+  relocate(set, player1_game_score, player2_game_score, player1_set_score, player2_set_score, player1, player2, x, y, z, position) |>
+  View()
+
+# Nice!
+clean_shot_level(nadal_2022_cleaned) |> View()
+```
 
 
 

@@ -7,8 +7,6 @@ all_players <- bind_rows(read_csv(here::here("inst/player_ids/RG_players_2019.cs
   distinct(id, .keep_all = TRUE) |>
   select(id, firstName, lastName)
 
-
-
 players_to_add <- tibble(id = c(31132, 43970, 31976, 42340,
                                 18005, 30524, 9525, 42560,
                                 11713, 42559, 12105, 32390,
@@ -21,10 +19,10 @@ players_to_add <- tibble(id = c(31132, 43970, 31976, 42340,
                                       "GIORGI", "FERRO", "MONFILS", "ZHENG",
                                       "DEL POTRO", "AVANESYAN", "MAYER", "OFNER",
                                       "YMER", "KOLAR"))
-all_players <- bind_rows(all_players, players_to_add)
+all_players <- bind_rows(all_players, players_to_add) |>
+  mutate(lastName = str_to_title(lastName)) |>
+  mutate(fullName = paste(firstName, lastName))
 ## all_players should now have all ID's represented
-
-
 
 ## all_players |> filter(lastName == "ZVEREV")
 ## these are listed in order of the draw

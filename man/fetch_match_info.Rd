@@ -2,7 +2,7 @@
 % Please edit documentation in R/fetch_match_info.R
 \name{fetch_match_info}
 \alias{fetch_match_info}
-\title{Fetch Match Info}
+\title{Fetch Match Info Function}
 \usage{
 fetch_match_info(
   year = "(.|\\\\s)*\\\\S(.|\\\\s)*",

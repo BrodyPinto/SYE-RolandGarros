@@ -2,13 +2,13 @@
 #'
 #' This is a function that cleans the Court Vision data to the *point* level of granularity.
 #'
-#' @param raw_data is a data frame of the raw Court Vision data (must be output from the fetch_all_matches function)
+#' @param raw_data is a data frame of a single match of the raw Court Vision data
 #' @param player_of_interest is a string of the player's name we want as player1 - first or last name (case insensitive)
-#' @return a data frame with a row for each point played in the match/matches of interest
+#' @return returns a data frame with a row for each point played in the match/matches of interest
 #'
 #' @examples
-#' nadal_final_2022 <- fetch_all_matches(player = "Nadal", year = "2022", round = "F")
-#' clean_point_level(nadal_final_2022)
+#' nadal_final_2022 <- fetch_all_matches(player = "Nadal", year = "2022", round = "F") # returns a list of data frames
+#' clean_point_level(nadal_final_2022[[1]]) # this function takes in one data frame (a single match)
 #'
 #' @import tidyverse
 #' @export
@@ -187,18 +187,16 @@ clean_point_level <- function(raw_data, player_of_interest = "(.|\\s)*\\S(.|\\s)
       # Safely convert to numeric, assigning NA if conversion fails
       player1_score_numeric = suppressWarnings(as.numeric(player1_game_score)),
       player2_score_numeric = suppressWarnings(as.numeric(player2_game_score)),
-
       # Create a flag for the condition
       reset_scores = !(player1_game_score %in% c("0", "15", "30", "40")) &
         !(player2_game_score %in% c("0", "15", "30", "40")) &
         !is.na(player1_score_numeric) & !is.na(player2_score_numeric) &
         player1_score_numeric + player2_score_numeric >= 12 &
         abs(player1_score_numeric - player2_score_numeric) == 2,
-
       # Use the flag to set both scores
       player1_game_score = if_else(reset_scores, "0", player1_game_score),
-      player2_game_score = if_else(reset_scores, "0", player2_game_score)
-    ) |>
+      player2_game_score = if_else(reset_scores, "0", player2_game_score)) |>
+
     ## set score lag:
     mutate(player1_set1_lag = ifelse(serve == 2, lag(player1_set1, 2, default = 0), lag(player1_set1, default = 0)),
            player1_set2_lag = ifelse(serve == 2, lag(player1_set2, 2, default = 0), lag(player1_set2, default = 0)),
@@ -220,7 +218,18 @@ clean_point_level <- function(raw_data, player_of_interest = "(.|\\s)*\\S(.|\\s)
                                          set == 3 ~ player2_set3_lag,
                                          set == 4 ~ player2_set4_lag,
                                          set == 5 ~ player2_set5_lag)) |>
-    relocate(player1_game_score, player2_game_score, player1_set_score, player2_set_score) |>
+
+    # TODO: all_players df is required here, should I embed this in this function?
+    # Replace serverId, scorerId, receiverId with player names instead of ids
+    left_join(all_players, by = c("serverId" = "id")) |>
+    mutate(serverId = fullName) |>
+    select(-fullName) |>
+    left_join(all_players, by = c("scorerId" = "id")) |>
+    mutate(scorerId = fullName) |>
+    select(-fullName) |>
+    left_join(all_players, by = c("receiverId" = "id")) |>
+    mutate(receiverId = fullName) |>
+
     # Store original player names and scores
     mutate(
       original_player1 = player1,
@@ -228,41 +237,29 @@ clean_point_level <- function(raw_data, player_of_interest = "(.|\\s)*\\S(.|\\s)
       original_player1_game_score = player1_game_score,
       original_player2_game_score = player2_game_score,
       original_player1_set_score = player1_set_score,
-      original_player2_set_score = player2_set_score
-    ) |>
+      original_player2_set_score = player2_set_score) |>
 
-    # TODO: this isn't exactly working as intended - look at Botic match in nadal_2022
-
-    # Rearrange players and scores based on whether they match "nadal"
+    # Rearrange players and scores based on whether they match the player_of_interest
     mutate(
       player1 = case_when(
         str_detect(str_to_lower(original_player1), str_to_lower(player_of_interest)) ~ original_player1,
-        str_detect(str_to_lower(original_player2), str_to_lower(player_of_interest)) ~ original_player2
-      ),
+        str_detect(str_to_lower(original_player2), str_to_lower(player_of_interest)) ~ original_player2),
       player2 = case_when(
         str_detect(str_to_lower(original_player1), str_to_lower(player_of_interest)) ~ original_player2,
-        str_detect(str_to_lower(original_player2), str_to_lower(player_of_interest)) ~ original_player1
-      ),
+        str_detect(str_to_lower(original_player2), str_to_lower(player_of_interest)) ~ original_player1),
       player1_game_score = case_when(
         str_detect(str_to_lower(original_player1), str_to_lower(player_of_interest)) ~ original_player1_game_score,
-        str_detect(str_to_lower(original_player2), str_to_lower(player_of_interest)) ~ original_player2_game_score
-      ),
+        str_detect(str_to_lower(original_player2), str_to_lower(player_of_interest)) ~ original_player2_game_score),
       player2_game_score = case_when(
         str_detect(str_to_lower(original_player1), str_to_lower(player_of_interest)) ~ original_player2_game_score,
-        str_detect(str_to_lower(original_player2), str_to_lower(player_of_interest)) ~ original_player1_game_score
-      ),
+        str_detect(str_to_lower(original_player2), str_to_lower(player_of_interest)) ~ original_player1_game_score),
       player1_set_score = case_when(
         str_detect(str_to_lower(original_player1), str_to_lower(player_of_interest)) ~ original_player1_set_score,
-        str_detect(str_to_lower(original_player2), str_to_lower(player_of_interest)) ~ original_player2_set_score
-      ),
+        str_detect(str_to_lower(original_player2), str_to_lower(player_of_interest)) ~ original_player2_set_score),
       player2_set_score = case_when(
         str_detect(str_to_lower(original_player1), str_to_lower(player_of_interest)) ~ original_player2_set_score,
-        str_detect(str_to_lower(original_player2), str_to_lower(player_of_interest)) ~ original_player1_set_score
-      )
-    ) |>
+        str_detect(str_to_lower(original_player2), str_to_lower(player_of_interest)) ~ original_player1_set_score)) |>
     relocate(set, player1_game_score, player2_game_score, player1_set_score, player2_set_score, player1, player2)
 
   return(formatted_point_level)
 }
-
-nadal_2022 <- fetch_all_matches(player = "Nadal", year = 2022)

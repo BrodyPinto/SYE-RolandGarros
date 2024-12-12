@@ -1,11 +1,11 @@
-#' Fetch All Matches
+#' Fetch All Matches Function
 #'
-#' This is a function that collects and binds all matches that match the player, year, and/or round of interest.
+#' This is a function that collects all data frames of matches that match the player, year, and/or round of interest.
 #'
 #' @param player is a string of the player's name - first or last name (case insensitive)
 #' @param year is a string of the year the match was played - between 2019 and 2023
 #' @param round is a string of the round the match was played - F, SF, QF, R16, R32, R64, or R128
-#' @return a data frame of all matches that match the player, year, and/or round of interest
+#' @return returns a list of data frames (raw data frames of individual matches) that match the player, year, and/or round of interest
 #'
 #' @examples
 #' fetch_all_matches(player = "Nadal", year = "2022", round = "F") ## fetches the 2022 French Open final match that Nadal played
@@ -45,10 +45,5 @@ fetch_all_matches <- function(player = "(.|\\s)*\\S(.|\\s)*",
     return(df)
   })
 
-  # ## combine all data frames into a single data frame
-  # combined_df <- bind_rows(list_of_matches)
-
   return(list_of_matches)
 }
-
-nadal_2022 = fetch_all_matches(player = "Nadal", year = 2022)

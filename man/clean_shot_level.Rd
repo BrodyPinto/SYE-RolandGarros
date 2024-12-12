@@ -2,23 +2,21 @@
 % Please edit documentation in R/clean_shot_level.R
 \name{clean_shot_level}
 \alias{clean_shot_level}
-\title{Clean Shot Level}
+\title{Clean Shot Level Function}
 \usage{
-clean_shot_level(raw_data, player_of_interest = "(.|\\\\s)*\\\\S(.|\\\\s)*")
+clean_shot_level(cleaned_data)
 }
 \arguments{
-\item{raw_data}{is a data frame of the raw Court Vision data (must be output from the fetch_all_matches function)}
-
-\item{player_of_interest}{is a string of the player's name we want as player1 - first or last name (case insensitive)}
+\item{cleaned_data}{is a data frame of cleaned point-level data - from the clean_and_combine() function}
 }
 \value{
-a data frame with several rows (hit, net, peak, bounce) for each shot in the match/matches of interest
+returns a data frame with several rows (hit, net, peak, bounce) for each shot in the match/matches of interest
 }
 \description{
-This is a function that cleans the Court Vision data to the \emph{shot} level of granularity.
+This is a function that parses the trajectory data from the Court Vision data - breaking the match/matches down to the \emph{shot} level of granularity.
 }
 \examples{
-nadal_final_2022 <- fetch_all_matches(player = "Nadal", year = "2022", round = "F")
-clean_shot_level(nadal_final_2022)
+nadal_2022_cleaned <- clean_and_combine(nadal_2022, player_interest = "Nadal")
+clean_shot_level(nadal_2022_cleaned)
 
 }

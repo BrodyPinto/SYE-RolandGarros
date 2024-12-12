@@ -7,18 +7,18 @@
 clean_point_level(raw_data, player_of_interest = "(.|\\\\s)*\\\\S(.|\\\\s)*")
 }
 \arguments{
-\item{raw_data}{is a data frame of the raw Court Vision data (must be output from the fetch_all_matches function)}
+\item{raw_data}{is a data frame of a single match of the raw Court Vision data}
 
 \item{player_of_interest}{is a string of the player's name we want as player1 - first or last name (case insensitive)}
 }
 \value{
-a data frame with a row for each point played in the match/matches of interest
+returns a data frame with a row for each point played in the match/matches of interest
 }
 \description{
 This is a function that cleans the Court Vision data to the \emph{point} level of granularity.
 }
 \examples{
-nadal_final_2022 <- fetch_all_matches(player = "Nadal", year = "2022", round = "F")
-clean_point_level(nadal_final_2022)
+nadal_final_2022 <- fetch_all_matches(player = "Nadal", year = "2022", round = "F") # returns a list of data frames
+clean_point_level(nadal_final_2022[[1]]) # this function takes in one data frame (a single match)
 
 }
