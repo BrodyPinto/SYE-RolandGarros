@@ -1,5 +1,11 @@
 ## Task List
 
+## December 19
+
+1. Replace player ID's with their names (three joins).
+
+2. Modify clean_shot_level to take in the clean_and_combine_point output.
+
 ## December 12
 
 1. Fix the 13 matches (directly in the file names).
