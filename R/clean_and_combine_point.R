@@ -6,7 +6,7 @@ clean_and_combine_point <- function(list_of_matches, player_interest = "(.|\\s)*
     ## clean the match_df to the point level
     match_clean <- clean_point_level(match_df, player_of_interest = player_interest)
 
-    ## add match_clean to a list of cleaned matches (use list() instead of append)
+    ## add match_clean to a list of cleaned matches
     list_of_cleaned_matches[[length(list_of_cleaned_matches) + 1]] <- match_clean
   }
 
@@ -17,3 +17,5 @@ clean_and_combine_point <- function(list_of_matches, player_interest = "(.|\\s)*
 }
 
 clean_and_combine_point(nadal_2022, player_interest = "Nadal") |> View()
+clean_and_combine_point(test_match_steph_final) |> View()
+clean_and_combine_point(all_matches_2022) |> View()

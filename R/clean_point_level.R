@@ -236,28 +236,28 @@ clean_point_level <- function(raw_data, player_of_interest = "(.|\\s)*\\S(.|\\s)
     # Rearrange players and scores based on whether they match "nadal"
     mutate(
       player1 = case_when(
-        str_detect(str_to_lower(original_player1), player_of_interest) ~ original_player1,
-        str_detect(str_to_lower(original_player2), player_of_interest) ~ original_player2
+        str_detect(str_to_lower(original_player1), str_to_lower(player_of_interest)) ~ original_player1,
+        str_detect(str_to_lower(original_player2), str_to_lower(player_of_interest)) ~ original_player2
       ),
       player2 = case_when(
-        str_detect(str_to_lower(original_player1), player_of_interest) ~ original_player2,
-        str_detect(str_to_lower(original_player2), player_of_interest) ~ original_player1
+        str_detect(str_to_lower(original_player1), str_to_lower(player_of_interest)) ~ original_player2,
+        str_detect(str_to_lower(original_player2), str_to_lower(player_of_interest)) ~ original_player1
       ),
       player1_game_score = case_when(
-        str_detect(str_to_lower(original_player1), player_of_interest) ~ original_player1_game_score,
-        str_detect(str_to_lower(original_player2), player_of_interest) ~ original_player2_game_score
+        str_detect(str_to_lower(original_player1), str_to_lower(player_of_interest)) ~ original_player1_game_score,
+        str_detect(str_to_lower(original_player2), str_to_lower(player_of_interest)) ~ original_player2_game_score
       ),
       player2_game_score = case_when(
-        str_detect(str_to_lower(original_player1), player_of_interest) ~ original_player2_game_score,
-        str_detect(str_to_lower(original_player2), player_of_interest) ~ original_player1_game_score
+        str_detect(str_to_lower(original_player1), str_to_lower(player_of_interest)) ~ original_player2_game_score,
+        str_detect(str_to_lower(original_player2), str_to_lower(player_of_interest)) ~ original_player1_game_score
       ),
       player1_set_score = case_when(
-        str_detect(str_to_lower(original_player1), player_of_interest) ~ original_player1_set_score,
-        str_detect(str_to_lower(original_player2), player_of_interest) ~ original_player2_set_score
+        str_detect(str_to_lower(original_player1), str_to_lower(player_of_interest)) ~ original_player1_set_score,
+        str_detect(str_to_lower(original_player2), str_to_lower(player_of_interest)) ~ original_player2_set_score
       ),
       player2_set_score = case_when(
-        str_detect(str_to_lower(original_player1), player_of_interest) ~ original_player2_set_score,
-        str_detect(str_to_lower(original_player2), player_of_interest) ~ original_player1_set_score
+        str_detect(str_to_lower(original_player1), str_to_lower(player_of_interest)) ~ original_player2_set_score,
+        str_detect(str_to_lower(original_player2), str_to_lower(player_of_interest)) ~ original_player1_set_score
       )
     ) |>
     relocate(set, player1_game_score, player2_game_score, player1_set_score, player2_set_score, player1, player2)
@@ -265,5 +265,4 @@ clean_point_level <- function(raw_data, player_of_interest = "(.|\\s)*\\S(.|\\s)
   return(formatted_point_level)
 }
 
-clean_point_level(nadal_2022, player_of_interest = "Nadal") |> View()
-clean_point_level(test_match1) |> View()
+nadal_2022 <- fetch_all_matches(player = "Nadal", year = 2022)

@@ -742,6 +742,7 @@ ggplot(data = alcaraz_receive, aes(x = x, y = y)) +
 ## Fixing the score variable
 ```{r}
 test_match_steph_final <- fetch_all_matches(player = "Tsitsipas", year = 2021, round = "F")
+all_matches_2022 <- fetch_all_matches(year = 2022)
 
 second_serve_points <- test_match_steph_final |>
   ## must use fetch_all_matches(player, year, round) function to get dataset with match_id variable

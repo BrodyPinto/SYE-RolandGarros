@@ -4,7 +4,7 @@
 #'
 #' @param raw_data is a data frame of the raw Court Vision data (must be output from the fetch_all_matches function)
 #' @param player_of_interest is a string of the player's name we want as player1 - first or last name (case insensitive)
-#' @return a data frame with several rows (hit, net, peak, bounce) for each shot in the match/matches of interest
+#' @return returns a data frame with several rows (hit, net, peak, bounce) for each shot in the match/matches of interest
 #'
 #' @examples
 #' nadal_final_2022 <- fetch_all_matches(player = "Nadal", year = "2022", round = "F")

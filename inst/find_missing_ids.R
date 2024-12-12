@@ -30,7 +30,7 @@ all_players <- bind_rows(all_players, players_to_add)
 ## these are listed in order of the draw
 ## I think we can combine all of these player ids and just add the missing ones manually
 all_match_df <- fetch_all_matches()
-cleaned_point_level <- clean_point_level(all_match_df)
+cleaned_point_level <- clean_and_combine_point(all_match_df)
 
 
 merged_df <- left_join(cleaned_point_level, all_players, by = join_by(serverId == id)) |>
