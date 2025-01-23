@@ -1032,6 +1032,8 @@ all_players <- bind_rows(all_players, players_to_add) |>
   mutate(lastName = str_to_title(lastName)) |>
   mutate(fullName = paste(firstName, lastName))
 
+write.csv(all_players, file = "all_players.csv")
+
 nadal_2022_cleaned |>
   left_join(all_players, by = c("serverId" = "id")) |>
   mutate(serverId = fullName) |>

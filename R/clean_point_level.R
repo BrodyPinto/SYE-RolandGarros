@@ -14,6 +14,9 @@
 #' @export
 
 clean_point_level <- function(raw_data, player_of_interest = "(.|\\s)*\\S(.|\\s)*") {
+
+  all_players <- read_csv("inst/data/all_players.csv")
+
   second_serve_points <- raw_data |>
     ## must use fetch_all_matches(player, year, round) function to get dataset with match_id variable
     group_by(match_id) |>
