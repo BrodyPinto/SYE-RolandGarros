@@ -1,5 +1,14 @@
 ## Task List
 
+## January 30
+
+1. Finish data cleaning so that data is in one .rda file.
+
+2. Make some initial plots of Nadal's serve location (facet by match) and colour by a metric for "pressure." 
+
+3. Joining a point importance data set to the big data set. <https://github.com/skoval/deuce>.
+
+
 ## December 19
 
 1. Replace player ID's with their names (three joins).
