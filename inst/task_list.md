@@ -1,5 +1,15 @@
 ## Task List
 
+## February 6
+
+1. Make a new function that grabs matches from a player of interest (and makes that player player1).
+
+2. Document data.
+
+3. Make some initial plots of Nadal's serve location (facet by match) and colour by a metric for "pressure." 
+
+4. Joining a point importance data set to the big data set. <https://github.com/skoval/deuce>.
+
 ## January 30
 
 1. Finish data cleaning so that data is in one .rda file.
