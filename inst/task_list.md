@@ -12,6 +12,9 @@
 
 5. Create some exploratory plots for some other player of interest.
 
+6. Compare WTA and ATP tours and do some summary stats on things like serve location, net clearance, percent returns in play/cross-court.
+
+
 
 ## February 6
 
