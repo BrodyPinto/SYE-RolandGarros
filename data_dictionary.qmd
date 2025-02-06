@@ -1079,11 +1079,12 @@ clean_shot_level(nadal_2022_cleaned) |> View()
 ## Combine all matches into one .rda file
 ```{r}
 list_all_matches <- fetch_all_matches() # list of 180 matches
-all_matches_combined <- clean_and_combine(list_of_matches = list_all_matches)
-save(all_matches_combined, file = "./data/all_matches_cleaned_point.rda")
+all_matches <- clean_and_combine(list_of_matches = list_all_matches)
+save(all_matches, file = "./data/all_matches.rda")
 
 ## TODO: Now I need to make a new function that filters for a player of interest, returns a df that can be passed to clean_shot_level() function?
-
+filter_matches(player = "Nadal") |> View()
+all_matches_combined |> filter(player1 == "Rafael Nadal" | player2 == "Rafael Nadal")
 ```
 
 
