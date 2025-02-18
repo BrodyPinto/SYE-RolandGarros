@@ -11,6 +11,19 @@ A dataframe:
 \item set: the current set of the match (1-5 for ATP matches and 1-3 for WTA matches)
 \item player1_game_score: score of the current game for player1
 \item player2_game_score: score of the current game for player2
+\item player1_set_score: score of the current set for player1
+\item player2_set_score: score of the current set for player2
+\item player1: name (first and last) of player1
+\item player2: name (first and last) of player2
+\item round: tournament round (R64, R32, R16, QF, SF, F)
+\item year: tournament year (2019-2023)
+\item trajectoryData: list of ball location coordinates (x, y, z) during these four actions: hit, net, peak, bounce
+\item serve: first (1) or second (2) serve point
+\item serverId: name of the player who served the point
+\item receiverId: name of the player who received the point
+\item scorerId: name of the player who won the point
+\item rallyLength: length of the rally
+\item court: side of the court (DeuceCourt or AdCourt) the serve was on
 }
 }
 \usage{

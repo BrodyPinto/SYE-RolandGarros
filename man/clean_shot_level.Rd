@@ -7,7 +7,7 @@
 clean_shot_level(cleaned_data)
 }
 \arguments{
-\item{cleaned_data}{is a data frame of cleaned point-level data - from the clean_and_combine() function}
+\item{cleaned_data}{is a data frame of cleaned point-level data}
 }
 \value{
 returns a data frame with several rows (hit, net, peak, bounce) for each shot in the match/matches of interest

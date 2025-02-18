@@ -2,7 +2,7 @@
 #'
 #' This is a function that parses the trajectory data from the Court Vision data - breaking the match/matches down to the *shot* level of granularity.
 #'
-#' @param cleaned_data is a data frame of cleaned point-level data - from the clean_and_combine() function
+#' @param cleaned_data is a data frame of cleaned point-level data
 #' @return returns a data frame with several rows (hit, net, peak, bounce) for each shot in the match/matches of interest
 #'
 #' @examples
@@ -34,7 +34,8 @@ clean_shot_level <- function(cleaned_data) {
     ## net_height and net_clearance variables:
     mutate(net_height = 0.00619 * (y^2) + 0.914) |>
     mutate(net_clearance = z - net_height) |>
-    relocate(set, player1_game_score, player2_game_score, player1_set_score, player2_set_score, player1, player2, x, y, z, position)
+    relocate(player1_game_score, player2_game_score, player1_set_score, player2_set_score, player1, player2, x, y, z, position,
+             hit_count, net_clearance)
 
   return(formatted_shot_level)
 }

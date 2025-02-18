@@ -2,23 +2,20 @@
 #'
 #' This is a function that finds all matches of a specified player, year, and/or round
 #'
-#' @param player is a string of the player's name - first or last name (case insensitive)
-#' @param year is a string of the year the match was played - between 2019 and 2023
-#' @param round is a string of the round the match was played - F, SF, QF, R16, R32, R64, or R128
-#' @return returns a point-level data frame of all matches given the specified player, year, and/pr round
+#' @param player is a string of the player's name - first and last name (case sensitive)
+#' @param year_of_interest is a string of the year the match was played - between 2019 and 2023
+#' @return returns a point-level data frame of all matches given the specified player and year
 #'
 #' @import tidyverse
 #' @export
 
 filter_matches <- function(player = "(.|\\s)*\\S(.|\\s)*",
-                           year = "(.|\\s)*\\S(.|\\s)*",
-                           round = "(.|\\s)*\\S(.|\\s)*") {
+                           year_of_interest = "(.|\\s)*\\S(.|\\s)*") {
 
-  filtered_df <- all_matches_combined |>
+  filtered_df <- all_matches |>
     # Filter based on the paramters of the function
-    filter(player1 == player | player2 == player,
-           year == year,
-           round == round) |>
+    filter(player1 == player | player2 == player) |>
+    filter(year == year_of_interest) |>
 
     # Store original player names and scores
     mutate(

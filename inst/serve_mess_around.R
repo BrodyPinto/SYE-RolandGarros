@@ -88,10 +88,7 @@ ruud_ad <- ruud_ad |>
                      true = abs(y),
                      false = y)) |>
   mutate(y = if_else(x > 1, true = -y, false = y),
-                             x = if_else(x > 1,
-                              true = -x,
-                              false = x)
-                  )
+         x = if_else(x > 1, true = -x, false = x))
 
 ggplot(data = ruud_ad, aes(x = x, y = y)) +
   geom_point()  ## assuming the two dots by the net are lets...maybe?
