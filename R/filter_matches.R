@@ -13,7 +13,7 @@ filter_matches <- function(player = "(.|\\s)*\\S(.|\\s)*",
                            year_of_interest = "(.|\\s)*\\S(.|\\s)*") {
 
   filtered_df <- all_matches |>
-    # Filter based on the paramters of the function
+    # Filter based on the parameters of the function
     filter(player1 == player | player2 == player) |>
     filter(year == year_of_interest) |>
 
