@@ -1,5 +1,13 @@
 ## Task List
 
+## February 27
+
+1. Keep working on visualizations of serve (and return if you want). Maybe look into shot placement of other shots during a rally.
+
+2. Continue model exploration of other possible predictors (net clearance, for example).
+
+3. Fix up the last of the importance joining issues.
+
 ## February 20
 
 1. Document data.
