@@ -17,7 +17,7 @@ djokovic_2020_shots |> View()
 djokovic_2020_serves <- djokovic_2020_shots |>
   filter(serverId == "Novak Djokovic") |>
   filter(position == "bounce") |>
-  group_by(point_index) |>
+  group_by(point_index, player2) |>
   slice(1) |>
   relocate(position, shot_index, x, y, z) |>
   ungroup() |>
@@ -59,7 +59,7 @@ djokovic_2021_shots |> View()
 djokovic_2021_serves <- djokovic_2021_shots |>
   filter(serverId == "Novak Djokovic") |>
   filter(position == "bounce") |>
-  group_by(point_index) |>
+  group_by(point_index, player2) |>
   slice(1) |>
   relocate(position, shot_index, x, y, z) |>
   ungroup() |>
@@ -95,6 +95,10 @@ ggplot(data = djokovic_2021_deucead, aes(x = x, y = y)) +
   facet_wrap(~player2) +
   labs(title = "Novak Djokovic Serves - 2021 Title Run")
 
+djokovic_2021_deucead |>
+  filter(player2 == "Ricardas Berankis")
+
+djokovic_2021_serves |> View()
 
 
 

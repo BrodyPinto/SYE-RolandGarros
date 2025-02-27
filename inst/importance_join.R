@@ -70,6 +70,22 @@ join_ready_df <- all_matches |>
                                       serverId == player2 ~ player2_set_score),
          receiver_set_score = case_when(receiverId == player1 ~ player1_set_score,
                                         receiverId == player2 ~ player2_set_score)) |>
+  mutate(
+    server_game_score = case_when(
+      (server_game_score == "AD" & receiver_game_score == "40") ~ "40",
+      (server_game_score == "40" & receiver_game_score == "AD") ~ "30",
+      TRUE ~ server_game_score
+    ),
+    receiver_game_score = case_when(
+      (receiver_game_score == "AD" & server_game_score == "40") ~ "40",
+      (receiver_game_score == "40" & server_game_score == "AD") ~ "30",
+      TRUE ~ receiver_game_score
+    )
+  ) |>
+
+  mutate(server_game_score = as.numeric(server_game_score),
+         receiver_game_score = as.numeric(receiver_game_score)) |>
+
 
   ## Calculate match scores
   mutate(player1_match_score = 0,
@@ -95,6 +111,11 @@ join_ready_df <- all_matches |>
          receiver_match_score = case_when(receiverId == player1 ~ player1_match_score,
                                           receiverId == player2 ~ player2_match_score)) |>
 
+  mutate(score_diff = if_else(pmax(as.numeric(server_game_score), as.numeric(receiver_game_score)) > 6,
+                              pmax(as.numeric(server_game_score), as.numeric(receiver_game_score)) - 6, 0)) |>
+  mutate(server_game_score = server_game_score - score_diff,
+         receiver_game_score = receiver_game_score - score_diff) |>
+
   ## Combine scores
   mutate(game_score = paste(server_game_score, receiver_game_score, sep = "-"),
          set_score = paste(server_set_score, receiver_set_score, sep = "-"),
@@ -103,6 +124,10 @@ join_ready_df <- all_matches |>
   ## Handle AD-40 and 40-AD game scores:
   mutate(game_score = case_when(game_score == "AD-40" ~ "40-30",
                                 game_score == "40-AD" ~ "30-40",
+                                set_score == "0-0" & !(game_score %in% c("0-0", "0-15", "0-30", "0-40",
+                                                                         "15-0", "15-15", "15-30", "15-40",
+                                                                         "30-0", "30-15", "30-30", "30-40",
+                                                                         "40-0", "40-15", "40-30", "40-40")) ~ "0-0",
                                 TRUE ~ game_score)) |>
 
   ## TODO: still need to handle tiebreak scores like higher than 6-6

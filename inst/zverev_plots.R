@@ -21,7 +21,7 @@ zverev_2022_shots |> View()
 zverev_2022_serves <- zverev_2022_shots |>
   filter(serverId == "Alexander Zverev") |>
   filter(position == "bounce") |>
-  group_by(point_index) |>
+  group_by(point_index, player2) |>
   slice(1) |>
   relocate(position, shot_index, x, y, z) |>
   ungroup() |>
@@ -63,7 +63,7 @@ zverev_2021_shots |> View()
 zverev_2021_serves <- zverev_2021_shots |>
   filter(serverId == "Alexander Zverev") |>
   filter(position == "bounce") |>
-  group_by(point_index) |>
+  group_by(point_index, player2) |>
   slice(1) |>
   relocate(position, shot_index, x, y, z) |>
   ungroup() |>
