@@ -70,18 +70,23 @@ join_ready_df <- all_matches |>
                                       serverId == player2 ~ player2_set_score),
          receiver_set_score = case_when(receiverId == player1 ~ player1_set_score,
                                         receiverId == player2 ~ player2_set_score)) |>
+  mutate(is_tiebreak = if_else(server_set_score == 6 & receiver_set_score == 6, true = TRUE, false = FALSE)) |>
+  relocate(server_game_score, receiver_game_score, server_set_score, receiver_set_score, is_tiebreak) |>
+
   mutate(
-    server_game_score = case_when(
+    server_game_score2 = case_when(
       (server_game_score == "AD" & receiver_game_score == "40") ~ "40",
       (server_game_score == "40" & receiver_game_score == "AD") ~ "30",
       TRUE ~ server_game_score
     ),
-    receiver_game_score = case_when(
+    receiver_game_score2 = case_when(
       (receiver_game_score == "AD" & server_game_score == "40") ~ "40",
       (receiver_game_score == "40" & server_game_score == "AD") ~ "30",
       TRUE ~ receiver_game_score
     )
   ) |>
+  mutate(server_game_score = server_game_score2,
+         receiver_game_score = receiver_game_score2) |>
 
   mutate(server_game_score = as.numeric(server_game_score),
          receiver_game_score = as.numeric(receiver_game_score)) |>
@@ -111,8 +116,10 @@ join_ready_df <- all_matches |>
          receiver_match_score = case_when(receiverId == player1 ~ player1_match_score,
                                           receiverId == player2 ~ player2_match_score)) |>
 
-  mutate(score_diff = if_else(pmax(as.numeric(server_game_score), as.numeric(receiver_game_score)) > 6,
-                              pmax(as.numeric(server_game_score), as.numeric(receiver_game_score)) - 6, 0)) |>
+  mutate(score_diff = if_else(is_tiebreak == TRUE,
+                              if_else(pmax(server_game_score, receiver_game_score) > 6,
+                                      pmax(server_game_score, receiver_game_score) - 6, 0),
+                              0)) |>
   mutate(server_game_score = server_game_score - score_diff,
          receiver_game_score = receiver_game_score - score_diff) |>
 
@@ -142,6 +149,10 @@ all_matches_importance <- join_ready_df |>
                                      "match_score" = "set_score")) |>
   relocate(game_score, set_score, match_score, importance)
 
-## TODO: still a couple strange things going on with the score, but overall mostly good :)
+## this is as good as I'm going to get this, 98 NA's out of 39,000 observations
+## players involved in NA importance:
+## Cilic, Rublev, Rybakina, Pavyluchenkova, Badosa, Zidansek, Mertens, Gauff, Krejcikova, Sakkari
 all_matches_importance |> filter(is.na(importance)) |> View()
+
+View(all_matches_importance)
 
