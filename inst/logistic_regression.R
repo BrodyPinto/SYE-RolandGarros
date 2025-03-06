@@ -58,4 +58,22 @@ visreg(mod1, "ballSpeed", scale = "response", gg = TRUE)
 visreg(mod1, "receiverId", scale = "response", gg = TRUE)
 
 
+## AVERAGE NET CLEARANCE AS A WIN PREDICTOR
+df1 <- nadal_2022_shots |>
+  filter(position == "net") |>
+  mutate(nadal_win = if_else(scorerId == "Rafael Nadal", true = 1, false = 0)) |>
+  group_by(match_id, set, game, point) |>
+  mutate(avg_net_clearance = mean(net_clearance)) |>
+  ungroup() |>
+  relocate(avg_net_clearance, nadal_win, net_clearance)
+
+mod_net_clearance = glm(nadal_win ~ avg_net_clearance, data = df1, family = "binomial")
+summary(mod_net_clearance)
+visreg(mod_net_clearance, "avg_net_clearance", scale = "response", gg = TRUE)
+
+
+
+
+
+
 

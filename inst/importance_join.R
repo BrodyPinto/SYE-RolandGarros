@@ -147,12 +147,16 @@ all_matches_importance <- join_ready_df |>
   left_join(atp_importance_5, by = c("game_score" = "point_score",
                                      "set_score" = "game_score",
                                      "match_score" = "set_score")) |>
-  relocate(game_score, set_score, match_score, importance)
+  relocate(game_score, set_score, match_score, importance, is_imortant)
 
 ## this is as good as I'm going to get this, 98 NA's out of 39,000 observations
 ## players involved in NA importance:
 ## Cilic, Rublev, Rybakina, Pavyluchenkova, Badosa, Zidansek, Mertens, Gauff, Krejcikova, Sakkari
 all_matches_importance |> filter(is.na(importance)) |> View()
+
+all_matches_importance <- all_matches_importance |>
+  mutate(is_important = if_else(importance >= 0.1, 1, 0)) |>
+  relocate(is_important)
 
 View(all_matches_importance)
 
