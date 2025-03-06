@@ -1,5 +1,17 @@
 ## Task List
 
+## March 13
+
+1. Look into net clearance joining issue.
+
+2. Issue with the smoothing (either do two separate serve plots or do the same plot). Maybe do something similar to the return. Look at first serve returns vs. second serve returns.
+
+3. Look at Djokovic returns.
+
+4. return on break vs. non-break points or important points.
+
+5. Modify importance for women?
+
 ## March 6
 
 1. Keep working on visualizations of serve (and return if you want and third shot if you want).
