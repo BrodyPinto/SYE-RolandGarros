@@ -1,5 +1,15 @@
 ## Task List
 
+## March 27
+
+1. Look into net clearance joining issue.
+
+2. Issue with the smoothing (either do two separate serve plots or do the same plot). Maybe do something similar to the return. Look at first serve returns vs. second serve returns.
+
+3. return on break vs. non-break points or important points.
+
+4. Make a few plots for a couple of the top women (maybe add importance to wta).
+
 ## March 13
 
 1. Look into net clearance joining issue.
