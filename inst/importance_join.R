@@ -140,13 +140,15 @@ join_ready_df <- all_matches |>
   relocate(server_game_score, receiver_game_score, game_score, server_set_score, receiver_set_score,
            set_score, server_match_score, receiver_match_score, match_score)
 
-atp_importance_5 <- atp_importance |> filter(bestof == 5)
+atp_importance_5 <- atp_importance |>
+  filter(bestof == 5) |>
+  distinct(point_score, game_score, set_score, .keep_all = TRUE)
 
 all_matches_importance <- join_ready_df |>
   left_join(atp_importance_5, by = c("game_score" = "point_score",
                                      "set_score" = "game_score",
                                      "match_score" = "set_score")) |>
-  mutate(is_important = if_else(importance >= 0.1, 1, 0)) |>
+  mutate(is_important = if_else(importance >= 0.2, 1, 0)) |>
   relocate(game_score, set_score, match_score, importance, is_important)
 
 ## this is as good as I'm going to get this, 98 NA's out of 39,000 observations
@@ -155,4 +157,10 @@ all_matches_importance <- join_ready_df |>
 all_matches_importance |> filter(is.na(importance)) |> View()
 
 View(all_matches_importance)
+
+atp_importance_5 |>
+  group_by(point_score, game_score, set_score) |>
+  summarise(n = n()) |>
+  arrange(desc(n))
+
 

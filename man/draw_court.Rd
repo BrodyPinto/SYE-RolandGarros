@@ -7,7 +7,7 @@
 draw_court()
 }
 \value{
-returns a ggplot object with solid lines representing the lines on the tennis court, dashed line represents the net
+returns ggplot layers drawing solid lines representing the lines on the tennis court, dashed line represents the net
 }
 \description{
 This is a function that draws the tennis court (dimensions are to scale)
