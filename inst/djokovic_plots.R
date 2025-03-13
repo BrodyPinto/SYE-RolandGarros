@@ -100,6 +100,100 @@ djokovic_2021_deucead |>
 
 djokovic_2021_serves |> View()
 
+## RETURNS
+
+## 2020 Finalist Run
+djokovic_2020_returns <- djokovic_2020_shots |>
+  filter(receiverId == "Novak Djokovic") |>
+  filter(position == "bounce") |>
+  group_by(point_index, player2) |>
+  slice(2) |>
+  mutate(y = if_else(x < 0, true = -y, false = y),
+         x = if_else(x < 0, true = -x, false = x),
+         serve = as_factor(serve),
+         serve = fct_relevel(serve, "1","2")) |>
+  relocate(position, shot_index, x, y, z)
+
+ggplot(data = djokovic_2020_returns, aes(x = x, y = y)) +
+  geom_density_2d_filled(show.legend = FALSE, bins = 9) +
+  geom_point(alpha = 0.6, size = 1.2, show.legend = TRUE, aes(color = serve)) +
+  scale_color_manual(name = "Serve Type", values = c("black", "green3")) +
+  scale_fill_brewer(palette = "Oranges") +
+  draw_court() +
+  facet_wrap(~player2) +
+  labs(title = "Novak Djokovic Return Locations - 2020 Finalist Run")
+
+## Joining for net clearance
+djokovic_2020_returns_clearance <- djokovic_2020_shots |>
+  filter(receiverId == "Novak Djokovic") |>
+  filter(position == "net") |>
+  group_by(point_index, player2) |>
+  slice(2) |>
+  filter(net_clearance > 0) |>
+  relocate(net_clearance, position, shot_index, x, y, z)
+
+djokovic_2020_returns_joined <- left_join(djokovic_2020_returns, djokovic_2020_returns_clearance,
+                                          by = c("match_id", "set", "game", "point", "hit_count")) |>
+  relocate(net_clearance.y)
+
+## THIS IS COOL 😎
+ggplot(data = djokovic_2020_returns_joined, aes(x = x.x, y = y.x)) +
+  geom_density_2d_filled(show.legend = FALSE, bins = 9) +
+  geom_point(alpha = 0.8, size = 1.2, show.legend = TRUE, aes(color = net_clearance.y)) +
+  scale_color_viridis_c(name = "Net Clearance (m)", option = "viridis") +
+  scale_fill_brewer(palette = "Oranges") +
+  draw_court() +
+  facet_wrap(~player2.x) +
+  labs(title = "Novak Djokovic Return Locations - 2020 Finalist Run")
+
+## 2021 Title Run
+djokovic_2021_returns <- djokovic_2021_shots |>
+  filter(receiverId == "Novak Djokovic") |>
+  filter(position == "bounce") |>
+  group_by(point_index, player2) |>
+  slice(2) |>
+  mutate(y = if_else(x < 0, true = -y, false = y),
+         x = if_else(x < 0, true = -x, false = x),
+         serve = as_factor(serve),
+         serve = fct_relevel(serve, "1","2")) |>
+  relocate(position, shot_index, x, y, z)
+
+ggplot(data = djokovic_2021_returns, aes(x = x, y = y)) +
+  geom_density_2d_filled(show.legend = FALSE, bins = 9) +
+  geom_point(alpha = 0.6, size = 1.2, show.legend = TRUE, aes(color = serve)) +
+  scale_color_manual(name = "Serve Type", values = c("black", "green3")) +
+  scale_fill_brewer(palette = "Oranges") +
+  draw_court() +
+  facet_wrap(~player2) +
+  labs(title = "Novak Djokovic Return Locations - 2021 Title Run")
+
+## Joining for net clearance
+djokovic_2021_returns_clearance <- djokovic_2021_shots |>
+  filter(receiverId == "Novak Djokovic") |>
+  filter(position == "net") |>
+  group_by(point_index, player2) |>
+  slice(2) |>
+  filter(net_clearance > 0) |>
+  relocate(net_clearance, position, shot_index, x, y, z)
+
+djokovic_2021_returns_joined <- left_join(djokovic_2021_returns, djokovic_2021_returns_clearance,
+                                          by = c("match_id", "set", "game", "point", "hit_count")) |>
+  relocate(net_clearance.y)
+
+## THIS IS COOL 😎
+ggplot(data = djokovic_2021_returns_joined, aes(x = x.x, y = y.x)) +
+  geom_density_2d_filled(show.legend = FALSE, bins = 9) +
+  geom_point(alpha = 0.8, size = 1.2, show.legend = TRUE, aes(color = net_clearance.y)) +
+  scale_color_viridis_c(name = "Net Clearance (m)", option = "viridis") +
+  scale_fill_brewer(palette = "Oranges") +
+  draw_court() +
+  facet_wrap(~player2.x) +
+  labs(title = "Novak Djokovic Return Locations - 2021 Title Run")
+
+## Histogram for net clearance
+ggplot(data = djokovic_2020_returns_joined, aes(net_clearance.y)) +
+  geom_histogram()
+
 
 
 

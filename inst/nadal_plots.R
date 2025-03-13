@@ -46,12 +46,12 @@ nadal_2022_ad <- nadal_2022_serves |>
 
 nadal_2022_deucead <- bind_rows(nadal_2022_deuce, nadal_2022_ad)
 
-## TODO: How do I get rid of the level thing on the legend?
 ggplot(data = nadal_2022_deucead, aes(x = x, y = y)) +
   geom_density_2d_filled(show.legend = FALSE, bins = 9) +
   geom_point(alpha = 0.5, size = 1.2, aes(color = break_point), show.legend = TRUE) +
   scale_colour_manual(name = "Break Point", values = c("green", "black")) +
   scale_fill_brewer(palette = "Oranges") +
+  guides(fill = "none") +
   draw_court() +
   facet_wrap(~player2) +
   labs(title = "Rafael Nadal Serve Locations - 2022 Title Run")
@@ -93,6 +93,7 @@ ggplot(data = nadal_2022_deucead1, aes(x = x, y = y)) +
   geom_point(alpha = 0.5, size = 1.2, aes(color = break_point), show.legend = TRUE) +
   scale_colour_manual(name = "Break Point", values = c("green", "black")) +
   scale_fill_brewer(palette = "Oranges") +
+  guides(fill = "none") +
   draw_court() +
   facet_wrap(~player2) +
   labs(title = "Rafael Nadal First Serve Locations - 2022 Title Run")
@@ -136,6 +137,7 @@ ggplot(data = nadal_2021_deucead, aes(x = x, y = y)) +
   geom_point(alpha = 0.5, size = 1.2, aes(color = break_point), show.legend = TRUE) +
   scale_colour_manual(name = "Break Point", values = c("green", "black")) +
   scale_fill_brewer(palette = "Oranges") +
+  guides(fill = "none") +
   draw_court() +
   facet_wrap(~player2) +
   labs(title = "Rafael Nadal Serve Locations - 2021 Finalist Run")
@@ -177,6 +179,7 @@ ggplot(data = nadal_2021_deucead1, aes(x = x, y = y)) +
   geom_point(alpha = 0.5, size = 1.2, aes(color = break_point), show.legend = TRUE) +
   scale_colour_manual(name = "Break Point", values = c("green", "black")) +
   scale_fill_brewer(palette = "Oranges") +
+  guides(fill = "none") +
   draw_court() +
   facet_wrap(~player2) +
   labs(title = "Rafael Nadal First Serve Locations - 2021 Finalist Run")
@@ -201,6 +204,7 @@ ggplot(data = nadal_2022_returns, aes(x = x, y = y)) +
   geom_point(alpha = 0.6, size = 1.2, show.legend = TRUE, aes(color = serve)) +
   scale_color_manual(name = "Serve Type", values = c("black", "green3")) +
   scale_fill_brewer(palette = "Oranges") +
+  guides(fill = "none") +
   draw_court() +
   facet_wrap(~player2) +
   labs(title = "Rafael Nadal Return Locations - 2022 Title Run")
@@ -222,8 +226,9 @@ nadal_2022_returns_joined <- left_join(nadal_2022_returns, nadal_2022_returns_cl
 ggplot(data = nadal_2022_returns_joined, aes(x = x.x, y = y.x)) +
   geom_density_2d_filled(show.legend = FALSE, bins = 9) +
   geom_point(alpha = 0.8, size = 1.2, show.legend = TRUE, aes(color = net_clearance.y)) +
-  scale_color_viridis_b(name = "Net Clearance (m)", option = "rocket") +
+  scale_color_viridis_c(name = "Net Clearance (m)", option = "viridis") +
   scale_fill_brewer(palette = "Oranges") +
+  guides(fill = "none") +
   draw_court() +
   facet_wrap(~player2.x) +
   labs(title = "Rafael Nadal Return Locations - 2022 Title Run")
@@ -245,6 +250,7 @@ ggplot(data = nadal_2021_returns, aes(x = x, y = y)) +
   geom_point(alpha = 0.6, size = 1.2, show.legend = TRUE, aes(color = serve)) +
   scale_color_manual(name = "Serve Type", values = c("black", "green3")) +
   scale_fill_brewer(palette = "Oranges") +
+  guides(fill = "none") +
   draw_court() +
   facet_wrap(~player2) +
   labs(title = "Rafael Nadal Return Locations - 2021 Finalist Run")
@@ -266,11 +272,16 @@ nadal_2021_returns_joined <- left_join(nadal_2021_returns, nadal_2021_returns_cl
 ggplot(data = nadal_2021_returns_joined, aes(x = x.x, y = y.x)) +
   geom_density_2d_filled(show.legend = FALSE, bins = 9) +
   geom_point(alpha = 0.8, size = 1.2, show.legend = TRUE, aes(color = net_clearance.y)) +
-  scale_color_viridis_b(name = "Net Clearance (m)", option = "rocket") +
+  scale_color_viridis_c(name = "Net Clearance (m)", option = "viridis") +
   scale_fill_brewer(palette = "Oranges") +
+  guides(fill = "none") +
   draw_court() +
   facet_wrap(~player2.x) +
   labs(title = "Rafael Nadal Return Locations - 2021 Finalist Run")
+
+## Histogram for net clearance
+ggplot(data = nadal_2022_returns_joined, aes(net_clearance.y)) +
+  geom_histogram()
 
 
 

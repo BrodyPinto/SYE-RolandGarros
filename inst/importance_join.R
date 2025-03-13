@@ -5,7 +5,7 @@ all_matches |> filter(year != "2019") |>
            player1_set2_lag, player2_set2_lag, player1_set3_lag, player2_set3_lag) |> View()
 
 join_ready_df <- all_matches |>
-  filter(year != "2019") |>
+  #filter(year != "2019") |>
 
   ## Correct Player Names
   mutate(
@@ -136,7 +136,6 @@ join_ready_df <- all_matches |>
                                                                          "30-0", "30-15", "30-30", "30-40",
                                                                          "40-0", "40-15", "40-30", "40-40")) ~ "0-0",
                                 TRUE ~ game_score)) |>
-
   ## TODO: still need to handle tiebreak scores like higher than 6-6
   relocate(server_game_score, receiver_game_score, game_score, server_set_score, receiver_set_score,
            set_score, server_match_score, receiver_match_score, match_score)
@@ -147,16 +146,13 @@ all_matches_importance <- join_ready_df |>
   left_join(atp_importance_5, by = c("game_score" = "point_score",
                                      "set_score" = "game_score",
                                      "match_score" = "set_score")) |>
-  relocate(game_score, set_score, match_score, importance, is_imortant)
+  mutate(is_important = if_else(importance >= 0.1, 1, 0)) |>
+  relocate(game_score, set_score, match_score, importance, is_important)
 
 ## this is as good as I'm going to get this, 98 NA's out of 39,000 observations
 ## players involved in NA importance:
 ## Cilic, Rublev, Rybakina, Pavyluchenkova, Badosa, Zidansek, Mertens, Gauff, Krejcikova, Sakkari
 all_matches_importance |> filter(is.na(importance)) |> View()
-
-all_matches_importance <- all_matches_importance |>
-  mutate(is_important = if_else(importance >= 0.1, 1, 0)) |>
-  relocate(is_important)
 
 View(all_matches_importance)
 
