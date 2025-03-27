@@ -1,5 +1,14 @@
 ## Task List
 
+## April 3
+
+1. Finish up the atp stuff (Djokovic, Nadal, Zverev).
+
+2. Finish the wta stuff (Swiatek, Gauff, Muchova?, Kredjikova?).
+
+3. Start thinking through the story that you want to tell.
+
+
 ## March 27
 
 1. Look into net clearance joining issue.
