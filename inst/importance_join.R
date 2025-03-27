@@ -142,28 +142,29 @@ join_ready_df <- all_matches |>
 
 atp_importance_5 <- atp_importance |>
   filter(bestof == 5) |>
-  distinct(point_score, game_score, set_score, .keep_all = TRUE)
-
-atp_importance_5 |>
-  filter(importance == max(importance))
+  distinct(point_score, game_score, set_score, .keep_all = TRUE) |>
+  mutate(atp_importance = importance) |>
+  select(-importance)
 
 wta_importance_3 <- atp_importance |>
   filter(bestof == 3) |>
   distinct(point_score, game_score, set_score, .keep_all = TRUE) |>
-  filter(importance == max(importance))
+  mutate(wta_importance = importance) |>
+  select(-importance)
 
 all_matches_importance <- join_ready_df |>
   left_join(atp_importance_5, by = c("game_score" = "point_score",
                                      "set_score" = "game_score",
                                      "match_score" = "set_score")) |>
-  mutate(is_important = if_else(importance >= 0.125, 1, 0),
-         is_important = as.logical(is_important)) |>
-  relocate(game_score, set_score, match_score, importance, is_important)
+  left_join(wta_importance_3, by = c("game_score" = "point_score",
+                                     "set_score" = "game_score",
+                                     "match_score" = "set_score")) |>
+  relocate(game_score, set_score, match_score, atp_importance, wta_importance)
 
 ## this is as good as I'm going to get this, 98 NA's out of 39,000 observations
 ## players involved in NA importance:
 ## Cilic, Rublev, Rybakina, Pavyluchenkova, Badosa, Zidansek, Mertens, Gauff, Krejcikova, Sakkari
-all_matches_importance |> filter(is.na(importance)) |> View()
+all_matches_importance |> filter(is.na(atp_importance) & year != 2019) |> View()
 
 View(all_matches_importance)
 
@@ -171,5 +172,13 @@ atp_importance_5 |>
   group_by(point_score, game_score, set_score) |>
   summarise(n = n()) |>
   arrange(desc(n))
+
+## ATP IMPORTANCE
+max(all_matches_importance$atp_importance, na.rm = TRUE) # 0.25 max importance
+all_matches_importance |> filter(atp_importance >= 0.125) |> nrow() # 912 instances
+
+## WTA IMPORTANCE
+max(all_matches_importance$wta_importance, na.rm = TRUE) # 0.5 max importance
+all_matches_importance |> filter(wta_importance >= 0.25) |> nrow() # 582 instances
 
 

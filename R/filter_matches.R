@@ -14,8 +14,10 @@ filter_matches <- function(player = "(.|\\s)*\\S(.|\\s)*",
                            year_of_interest = "(.|\\s)*\\S(.|\\s)*") {
 
   filtered_df <- all_matches_importance |>
-    mutate(is_important = if_else(importance >= 0.125, 1, 0),
-           is_important = as.logical(is_important)) |>
+    mutate(atp_is_important = if_else(atp_importance >= 0.125, 1, 0),
+           atp_is_important = as.logical(atp_is_important),
+           wta_is_important = if_else(wta_importance >= 0.25, 1, 0),
+           wta_is_important = as.logical(wta_is_important)) |>
     # Filter based on the parameters of the function
     filter(player1 == player | player2 == player) |>
     filter(year == year_of_interest) |>

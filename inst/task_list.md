@@ -8,6 +8,17 @@
 
 3. Start thinking through the story that you want to tell.
 
+4. Numeric Summary of:
+percentage of important returns made, 
+avg shot/return depth for important vs non-important points (t-test?), 
+avg net clearance depending for important vs non-important points,
+avg shot/return safety (distance from closest line) for important vs non-important points,
+counts for types of serves to each box, 
+avg first serve/second serve speed depending on importance,
+avg serve safety (distance from closest line) for important vs non-important points, 
+etc...
+ - across years? across matches within one year?
+
 
 ## March 27
 

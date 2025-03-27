@@ -47,8 +47,7 @@ djokovic_2020_ad <- djokovic_2020_serves |>
 
 djokovic_2020_deucead <- bind_rows(djokovic_2020_deuce, djokovic_2020_ad)
 
-# TODO: not sure how I feel about representing the serve locations this way,
-# it's not super intuitive when I look at it, but that might just be me
+# TODO: rotate the plots 90 degrees with deuce side serves on top
 ggplot(data = djokovic_2020_deucead, aes(x = x, y = y)) +
   geom_density_2d_filled(show.legend = FALSE, bins = 9) +
   geom_point(alpha = 0.5, size = 1.2, aes(color = break_point), show.legend = TRUE) +
