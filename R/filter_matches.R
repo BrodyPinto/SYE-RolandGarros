@@ -1,6 +1,7 @@
 #' Filter Matches Function
 #'
 #' This is a function that finds all matches of a specified player, year, and/or round
+#' using the all_matches_importance dataset
 #'
 #' @param player is a string of the player's name - first and last name (case sensitive)
 #' @param year_of_interest is a string of the year the match was played - between 2019 and 2023
@@ -13,6 +14,8 @@ filter_matches <- function(player = "(.|\\s)*\\S(.|\\s)*",
                            year_of_interest = "(.|\\s)*\\S(.|\\s)*") {
 
   filtered_df <- all_matches_importance |>
+    mutate(is_important = if_else(importance >= 0.125, 1, 0),
+           is_important = as.logical(is_important)) |>
     # Filter based on the parameters of the function
     filter(player1 == player | player2 == player) |>
     filter(year == year_of_interest) |>

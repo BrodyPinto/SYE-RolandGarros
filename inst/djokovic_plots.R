@@ -33,7 +33,10 @@ djokovic_2020_deuce <- djokovic_2020_serves |>
   mutate(x = if_else(abs(x) < 1, true = -abs(x), false = x),
          y = if_else(abs(x) < 1, true = abs(y), false = y)) |>
   mutate(y = if_else(x > 1, true = -y, false = y),
-         x = if_else(x > 1, true = -x, false = x))
+         x = if_else(x > 1, true = -x, false = x)) |>
+  # flip points to the right side of the net to prevent induced concentration
+  mutate(x = if_else(y < 0, true = -x, false = x),
+         y = if_else(y < 0, true = -y, false = y))
 
 djokovic_2020_ad <- djokovic_2020_serves |>
   filter(court == "AdCourt") |>
@@ -44,11 +47,25 @@ djokovic_2020_ad <- djokovic_2020_serves |>
 
 djokovic_2020_deucead <- bind_rows(djokovic_2020_deuce, djokovic_2020_ad)
 
+# TODO: not sure how I feel about representing the serve locations this way,
+# it's not super intuitive when I look at it, but that might just be me
 ggplot(data = djokovic_2020_deucead, aes(x = x, y = y)) +
   geom_density_2d_filled(show.legend = FALSE, bins = 9) +
-  geom_point(alpha = 0.5, size = 1.2, aes(color = break_point), show.legend = FALSE) +
-  scale_colour_manual(values = c("green", "black")) +
+  geom_point(alpha = 0.5, size = 1.2, aes(color = break_point), show.legend = TRUE) +
+  scale_colour_manual(name = "Break Point", values = c("green", "black")) +
   scale_fill_brewer(palette = "Oranges") +
+  guides(fill = "none") +
+  draw_court() +
+  facet_wrap(~player2) +
+  labs(title = "Novak Djokovic Serves - 2020 Finalist Run")
+
+## First plot with is_important coloring
+ggplot(data = djokovic_2020_deucead, aes(x = x, y = y)) +
+  geom_density_2d_filled(show.legend = FALSE, bins = 9) +
+  geom_point(alpha = 0.45, size = 1.2, aes(color = is_important), show.legend = TRUE) +
+  scale_colour_manual(name = "Important Point", values = c("black", "green")) +
+  scale_fill_brewer(palette = "Oranges") +
+  guides(fill = "none") +
   draw_court() +
   facet_wrap(~player2) +
   labs(title = "Novak Djokovic Serves - 2020 Finalist Run")
@@ -88,15 +105,13 @@ djokovic_2021_deucead <- bind_rows(djokovic_2021_deuce, djokovic_2021_ad)
 
 ggplot(data = djokovic_2021_deucead, aes(x = x, y = y)) +
   geom_density_2d_filled(show.legend = FALSE, bins = 9) +
-  geom_point(alpha = 0.5, size = 1.2, aes(color = break_point), show.legend = FALSE) +
+  geom_point(alpha = 0.5, size = 1.2, aes(color = break_point), show.legend = TRUE) +
   scale_colour_manual(values = c("green", "black")) +
   scale_fill_brewer(palette = "Oranges") +
+  guides(fill = "none") +
   draw_court() +
   facet_wrap(~player2) +
   labs(title = "Novak Djokovic Serves - 2021 Title Run")
-
-djokovic_2021_deucead |>
-  filter(player2 == "Ricardas Berankis")
 
 djokovic_2021_serves |> View()
 
@@ -119,6 +134,7 @@ ggplot(data = djokovic_2020_returns, aes(x = x, y = y)) +
   geom_point(alpha = 0.6, size = 1.2, show.legend = TRUE, aes(color = serve)) +
   scale_color_manual(name = "Serve Type", values = c("black", "green3")) +
   scale_fill_brewer(palette = "Oranges") +
+  guides(fill = "none") +
   draw_court() +
   facet_wrap(~player2) +
   labs(title = "Novak Djokovic Return Locations - 2020 Finalist Run")
@@ -136,12 +152,18 @@ djokovic_2020_returns_joined <- left_join(djokovic_2020_returns, djokovic_2020_r
                                           by = c("match_id", "set", "game", "point", "hit_count")) |>
   relocate(net_clearance.y)
 
+## TODO: I think NA's in net clearance are coming from errors in data collection? join seems to be fine
+View(djokovic_2020_returns |> relocate(net_clearance, match_id, set, game, point, hit_count))
+
+View(djokovic_2020_returns_joined |> relocate(net_clearance.y, match_id, set, game, point, hit_count))
+
 ## THIS IS COOL 😎
 ggplot(data = djokovic_2020_returns_joined, aes(x = x.x, y = y.x)) +
   geom_density_2d_filled(show.legend = FALSE, bins = 9) +
   geom_point(alpha = 0.8, size = 1.2, show.legend = TRUE, aes(color = net_clearance.y)) +
   scale_color_viridis_c(name = "Net Clearance (m)", option = "viridis") +
   scale_fill_brewer(palette = "Oranges") +
+  guides(fill = "none") +
   draw_court() +
   facet_wrap(~player2.x) +
   labs(title = "Novak Djokovic Return Locations - 2020 Finalist Run")
@@ -163,6 +185,7 @@ ggplot(data = djokovic_2021_returns, aes(x = x, y = y)) +
   geom_point(alpha = 0.6, size = 1.2, show.legend = TRUE, aes(color = serve)) +
   scale_color_manual(name = "Serve Type", values = c("black", "green3")) +
   scale_fill_brewer(palette = "Oranges") +
+  guides(fill = "none") +
   draw_court() +
   facet_wrap(~player2) +
   labs(title = "Novak Djokovic Return Locations - 2021 Title Run")
@@ -186,6 +209,40 @@ ggplot(data = djokovic_2021_returns_joined, aes(x = x.x, y = y.x)) +
   geom_point(alpha = 0.8, size = 1.2, show.legend = TRUE, aes(color = net_clearance.y)) +
   scale_color_viridis_c(name = "Net Clearance (m)", option = "viridis") +
   scale_fill_brewer(palette = "Oranges") +
+  guides(fill = "none") +
+  draw_court() +
+  facet_wrap(~player2.x) +
+  labs(title = "Novak Djokovic Return Locations - 2021 Title Run")
+
+## COLORING BY BREAK POINT
+ggplot(data = djokovic_2021_returns_joined, aes(x = x.x, y = y.x)) +
+  geom_density_2d_filled(show.legend = FALSE, bins = 9) +
+  geom_point(alpha = 0.6, size = 1.2, show.legend = TRUE, aes(color = breakPoint.x)) +
+  scale_colour_manual(name = "Break Point", values = c("black", "green")) +
+  scale_fill_brewer(palette = "Oranges") +
+  guides(fill = "none") +
+  draw_court() +
+  facet_wrap(~player2.x) +
+  labs(title = "Novak Djokovic Return Locations - 2021 Title Run")
+
+## COLORING BY IMPORTANCE
+ggplot(data = djokovic_2021_returns_joined, aes(x = x.x, y = y.x)) +
+  geom_density_2d_filled(show.legend = FALSE, bins = 9) +
+  geom_point(alpha = 0.8, size = 1.2, show.legend = TRUE, aes(color = importance.x)) +
+  scale_colour_viridis_c(name = "Importance") +
+  scale_fill_brewer(palette = "Oranges") +
+  guides(fill = "none") +
+  draw_court() +
+  facet_wrap(~player2.x) +
+  labs(title = "Novak Djokovic Return Locations - 2021 Title Run")
+
+## COLORING BY IS_IMPORTANT
+ggplot(data = djokovic_2021_returns_joined, aes(x = x.x, y = y.x)) +
+  geom_density_2d_filled(show.legend = FALSE, bins = 9) +
+  geom_point(alpha = 0.6, size = 1.2, show.legend = TRUE, aes(color = is_important.x)) +
+  scale_colour_manual(name = "Is important?", values = c("black", "green")) +
+  scale_fill_brewer(palette = "Oranges") +
+  guides(fill = "none") +
   draw_court() +
   facet_wrap(~player2.x) +
   labs(title = "Novak Djokovic Return Locations - 2021 Title Run")

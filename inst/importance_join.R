@@ -144,11 +144,20 @@ atp_importance_5 <- atp_importance |>
   filter(bestof == 5) |>
   distinct(point_score, game_score, set_score, .keep_all = TRUE)
 
+atp_importance_5 |>
+  filter(importance == max(importance))
+
+wta_importance_3 <- atp_importance |>
+  filter(bestof == 3) |>
+  distinct(point_score, game_score, set_score, .keep_all = TRUE) |>
+  filter(importance == max(importance))
+
 all_matches_importance <- join_ready_df |>
   left_join(atp_importance_5, by = c("game_score" = "point_score",
                                      "set_score" = "game_score",
                                      "match_score" = "set_score")) |>
-  mutate(is_important = if_else(importance >= 0.2, 1, 0)) |>
+  mutate(is_important = if_else(importance >= 0.125, 1, 0),
+         is_important = as.logical(is_important)) |>
   relocate(game_score, set_score, match_score, importance, is_important)
 
 ## this is as good as I'm going to get this, 98 NA's out of 39,000 observations
