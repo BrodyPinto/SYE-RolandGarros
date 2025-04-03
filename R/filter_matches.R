@@ -18,6 +18,7 @@ filter_matches <- function(player = "(.|\\s)*\\S(.|\\s)*",
            atp_is_important = as.logical(atp_is_important),
            wta_is_important = if_else(wta_importance >= 0.25, 1, 0),
            wta_is_important = as.logical(wta_is_important)) |>
+
     # Filter based on the parameters of the function
     filter(player1 == player | player2 == player) |>
     filter(year == year_of_interest) |>

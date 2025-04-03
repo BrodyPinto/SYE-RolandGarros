@@ -11,7 +11,7 @@ djokovic_2021 <- filter_matches(player = "Novak Djokovic", year_of_interest = "2
 djokovic_2020_shots <- clean_shot_level(djokovic_2020)
 djokovic_2021_shots <- clean_shot_level(djokovic_2021)
 
-## 2022:
+## 2020:
 djokovic_2020_shots |> View()
 
 djokovic_2020_serves <- djokovic_2020_shots |>
