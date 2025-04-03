@@ -1,5 +1,28 @@
 ## Task List
 
+## April 10
+
+1. Tweak the break point / first serve colours and fix the coord fixed dimensions, add match scores to plot titles, order plots by round.
+
+2. write abstract. (1) Introduce the shot by shot data. (2) State what you did (wrangling, visualizing, etc.), (3) one or two interesting results.
+
+3. Start thinking through the story that you want to tell.
+
+4. Start outlining the poster. posterdown: <https://github.com/brentthorne/posterdown>. <https://github.com/hquin20/SYE/blob/main/poster/poster.Rmd>.
+
+5. Numeric Summary of:
+percentage of important returns made, 
+avg shot/return depth for important vs non-important points (t-test?), 
+avg net clearance depending for important vs non-important points,
+avg shot/return safety (distance from closest line) for important vs non-important points,
+counts for types of serves to each box, 
+avg first serve/second serve speed depending on importance,
+avg serve safety (distance from closest line) for important vs non-important points, 
+etc...
+ - across years? across matches within one year?
+
+ 
+
 ## April 3
 
 1. Finish up the atp stuff (Djokovic, Nadal, Zverev).
