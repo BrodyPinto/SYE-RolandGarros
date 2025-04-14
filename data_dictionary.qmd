@@ -1085,6 +1085,8 @@ save(all_matches, file = "./data/all_matches.rda")
 ## TODO: Now I need to make a new function that filters for a player of interest, returns a df that can be passed to clean_shot_level() function?
 filter_matches(player = "Rafael Nadal") |> View()
 all_matches_combined |> filter(player1 == "Rafael Nadal" | player2 == "Rafael Nadal")
+
+save(all_matches_importance, file = "./data/all_matches_importance.rda")
 ```
 
 

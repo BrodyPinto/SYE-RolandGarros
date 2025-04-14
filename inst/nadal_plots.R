@@ -36,33 +36,36 @@ nadal_2022_deuce <- nadal_2022_serves |>
          y = if_else(abs(x) < 1, true = abs(y), false = y)) |>
   mutate(y = if_else(x > 1, true = -y, false = y),
          x = if_else(x > 1, true = -x, false = x)) |>
-  # flip points to the right side of the net to prevent induced concentration
   mutate(x = if_else(y < 0, true = -x, false = x),
-         y = if_else(y < 0, true = -y, false = y))
+         y = if_else(y < 0, true = -y, false = y)) |>
+  # Rotate 90 degrees CCW: (x, y) -> (-y, x)
+  mutate(rot_x = -y, rot_y = x)
 
 nadal_2022_ad <- nadal_2022_serves |>
   filter(court == "AdCourt") |>
   mutate(x = if_else(abs(x) < 1, true = -abs(x), false = x),
          y = if_else(abs(x) < 1, true = -abs(y), false = y)) |>
   mutate(y = if_else(x > 1, true = -y, false = y),
-         x = if_else(x > 1, true = -x, false = x))
+         x = if_else(x > 1, true = -x, false = x)) |>
+  # Rotate 90 degrees CCW: (x, y) -> (-y, x)
+  mutate(rot_x = -y, rot_y = x)
 
 nadal_2022_deucead <- bind_rows(nadal_2022_deuce, nadal_2022_ad)
 
-ggplot(data = nadal_2022_deucead, aes(x = x, y = y)) +
+ggplot(data = nadal_2022_deucead, aes(x = rot_x, y = rot_y)) +
   geom_density_2d_filled(show.legend = FALSE, bins = 9) +
-  geom_point(alpha = 0.5, size = 1.2, aes(color = break_point), show.legend = TRUE) +
-  scale_colour_manual(name = "Break Point", values = c("green", "black")) +
+  geom_point(aes(color = break_point, alpha = break_point, size = break_point), show.legend = TRUE) +
+  scale_alpha_manual(name = "Break Point", values = c(1,0.3)) +
+  scale_size_manual(values = c(1.75, 1)) +
+  scale_colour_manual(name = "Break Point", values = c("#00FFFF", "black")) +
   scale_fill_brewer(palette = "Oranges") +
-  guides(fill = "none") +
+  guides(fill = "none", size = "none") +
   draw_court() +
-  facet_wrap(~player2) +
-  labs(title = "Rafael Nadal Serves - 2022 Title Run") +
-  coord_flip() +
-  scale_y_reverse()
+  facet_wrap(~plot_label_final) +
+  labs(title = "Rafael Nadal Serves - 2022 Title Run")
 
 ## First plot with is_important coloring
-ggplot(data = nadal_2022_deucead, aes(x = x, y = y)) +
+ggplot(data = nadal_2022_deucead, aes(x = rot_x, y = rot_y)) +
   geom_density_2d_filled(show.legend = FALSE, bins = 9) +
   geom_point(alpha = 0.6, size = 1.2, aes(color = atp_is_important), show.legend = TRUE) +
   scale_colour_manual(name = "Important Point", values = c("black", "green")) +
@@ -70,9 +73,7 @@ ggplot(data = nadal_2022_deucead, aes(x = x, y = y)) +
   guides(fill = "none") +
   draw_court() +
   facet_wrap(~player2) +
-  labs(title = "Rafael Nadal Serves - 2022 Title Run") +
-  coord_flip() +
-  scale_y_reverse()
+  labs(title = "Rafael Nadal Serves - 2022 Title Run")
 
 ## 2021:
 nadal_2021_shots |> View()
@@ -285,3 +286,4 @@ ggplot(data = nadal_2021_returns_joined, aes(x = x.x, y = y.x)) +
 ## Histogram for net clearance
 ggplot(data = nadal_2022_returns_joined, aes(net_clearance.y)) +
   geom_histogram()
+

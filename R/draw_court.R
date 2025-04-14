@@ -10,23 +10,21 @@
 #' @import tidyverse
 #' @export
 
+## TODO: flip x and y
 draw_court <- function() {
   list(
-    annotate(geom = "segment", y = 5.02, yend = 5.02, x = -11.88, xend = 11.88, alpha = 0.5),
-    annotate(geom = "segment", y = 4.11, yend = 4.11, x = -11.88, xend = 11.88, alpha = 0.5),
-    annotate(geom = "segment", y = -5.02, yend = -5.02, x = -11.88, xend = 11.88, alpha = 0.5),
-    annotate(geom = "segment", y = -4.11, yend = -4.11, x = -11.88, xend = 11.88, alpha = 0.5),
-    annotate(geom = "segment", y = 0, yend = 0, x = -6.4, xend = 6.4, alpha = 0.5),
-    annotate(geom = "segment", x = 0, xend = 0, y = -5.02, yend = 5.02,
-             linetype = 2, alpha = 0.5),
-    annotate(geom = "segment", x = -11.88, xend = -11.88, y = -5.02,
-             yend = 5.02, alpha = 0.5),
-    annotate(geom = "segment", x = 11.88, xend = 11.88, y = -5.02,
-             yend = 5.02, alpha = 0.5),
-    annotate(geom = "segment", x = -6.4, xend = -6.4, y = -4.11, yend = 4.11, alpha = 0.5),
-    annotate(geom = "segment", x = 6.4, xend = 6.4, y = -4.11, yend = 4.11, alpha = 0.5),
-    annotate(geom = "segment", y = 0, yend = 0, x = -11.88, xend = -11.6, alpha = 0.5),
-    annotate(geom = "segment", y = 0, yend = 0, x = 11.88, xend = 11.6, alpha = 0.5),
+    annotate(geom = "segment", x = 5.02, xend = 5.02, y = -11.88, yend = 11.88, alpha = 0.5),
+    annotate(geom = "segment", x = 4.11, xend = 4.11, y = -11.88, yend = 11.88, alpha = 0.5),
+    annotate(geom = "segment", x = -5.02, xend = -5.02, y = -11.88, yend = 11.88, alpha = 0.5),
+    annotate(geom = "segment", x = -4.11, xend = -4.11, y = -11.88, yend = 11.88, alpha = 0.5),
+    annotate(geom = "segment", x = 0, xend = 0, y = -6.4, yend = 6.4, alpha = 0.5),
+    annotate(geom = "segment", y = 0, yend = 0, x = -5.02, xend = 5.02, linetype = 2, alpha = 0.5),
+    annotate(geom = "segment", y = -11.88, yend = -11.88, x = -5.02, xend = 5.02, alpha = 0.5),
+    annotate(geom = "segment", y = 11.88, yend = 11.88, x = -5.02, xend = 5.02, alpha = 0.5),
+    annotate(geom = "segment", y = -6.4, yend = -6.4, x = -4.11, xend = 4.11, alpha = 0.5),
+    annotate(geom = "segment", y = 6.4, yend = 6.4, x = -4.11, xend = 4.11, alpha = 0.5),
+    annotate(geom = "segment", x = 0, xend = 0, y = -11.88, yend = -11.6, alpha = 0.5),
+    annotate(geom = "segment", x = 0, xend = 0, y = 11.88, yend = 11.6, alpha = 0.5),
     theme_void(),
     coord_fixed()
   )

@@ -4,7 +4,7 @@ library(tidyverse)
 library(viridis)
 
 ## Swiatek's 2022 Run to the French Open Title:
-swiatek_2022 <- filter_matches(player = "Iga Swiatek", year_of_interest = "2022")
+swiatek_2022 <- filter_matches(player = "Iga Swiatek", year_of_interest = "2023")
 ## Swiatek's 2021 Run to the quarterfinals, losing to Maria Sakkari
 swiatek_2021 <- filter_matches(player = "Iga Swiatek", year_of_interest = "2021")
 
@@ -38,18 +38,22 @@ swiatek_2022_deuce <- swiatek_2022_serves |>
          x = if_else(x > 1, true = -x, false = x)) |>
   # flip points to the right side of the net to prevent induced concentration
   mutate(x = if_else(y < 0, true = -x, false = x),
-         y = if_else(y < 0, true = -y, false = y))
+         y = if_else(y < 0, true = -y, false = y)) |>
+  # Rotate 90 degrees CCW: (x, y) -> (-y, x)
+  mutate(rot_x = -y, rot_y = x)
 
 swiatek_2022_ad <- swiatek_2022_serves |>
   filter(court == "AdCourt") |>
   mutate(x = if_else(abs(x) < 1, true = -abs(x), false = x),
          y = if_else(abs(x) < 1, true = -abs(y), false = y)) |>
   mutate(y = if_else(x > 1, true = -y, false = y),
-         x = if_else(x > 1, true = -x, false = x))
+         x = if_else(x > 1, true = -x, false = x)) |>
+  # Rotate 90 degrees CCW: (x, y) -> (-y, x)
+  mutate(rot_x = -y, rot_y = x)
 
 swiatek_2022_deucead <- bind_rows(swiatek_2022_deuce, swiatek_2022_ad)
 
-ggplot(data = swiatek_2022_deucead, aes(x = x, y = y)) +
+ggplot(data = swiatek_2022_deucead, aes(x = rot_x, y = rot_y)) +
   geom_density_2d_filled(show.legend = FALSE, bins = 9) +
   geom_point(alpha = 0.5, size = 1.2, aes(color = break_point), show.legend = TRUE) +
   scale_colour_manual(name = "Break Point", values = c("green", "black")) +
@@ -57,9 +61,7 @@ ggplot(data = swiatek_2022_deucead, aes(x = x, y = y)) +
   guides(fill = "none") +
   draw_court() +
   facet_wrap(~player2) +
-  labs(title = "Iga Swiatek Serves - 2022 Title Run") +
-  coord_flip() +
-  scale_y_reverse()
+  labs(title = "Iga Swiatek Serves - 2022 Title Run")
 
 ## First plot with is_important coloring
 ggplot(data = swiatek_2022_deucead, aes(x = x, y = y)) +
@@ -148,9 +150,11 @@ swiatek_2022_returns <- swiatek_2022_shots |>
          x = if_else(x < 0, true = -x, false = x),
          serve = as_factor(serve),
          serve = fct_relevel(serve, "1","2")) |>
-  relocate(position, shot_index, x, y, z)
+  relocate(position, shot_index, x, y, z) |>
+  # Rotate 90 degrees CCW: (x, y) -> (-y, x)
+  mutate(rot_x = -y, rot_y = x)
 
-ggplot(data = swiatek_2022_returns, aes(x = x, y = y)) +
+ggplot(data = swiatek_2022_returns, aes(x = rot_x, y = rot_y)) +
   geom_density_2d_filled(show.legend = FALSE, bins = 9) +
   geom_point(alpha = 0.6, size = 1.2, show.legend = TRUE, aes(color = serve)) +
   scale_color_manual(name = "Serve Type", values = c("black", "green3")) +
@@ -158,9 +162,7 @@ ggplot(data = swiatek_2022_returns, aes(x = x, y = y)) +
   guides(fill = "none") +
   draw_court() +
   facet_wrap(~player2) +
-  labs(title = "Iga Swiatek Return Locations - 2022 Title Run") +
-  coord_flip() +
-  scale_y_reverse()
+  labs(title = "Iga Swiatek Return Locations - 2022 Title Run")
 
 ## Joining for net clearance
 swiatek_2022_returns_clearance <- swiatek_2022_shots |>

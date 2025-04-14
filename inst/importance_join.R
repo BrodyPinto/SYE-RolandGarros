@@ -179,6 +179,6 @@ all_matches_importance |> filter(atp_importance >= 0.125) |> nrow() # 912 instan
 
 ## WTA IMPORTANCE
 max(all_matches_importance$wta_importance, na.rm = TRUE) # 0.5 max importance
-all_matches_importance |> filter(wta_importance >= 0.25) |> nrow() # 582 instances
+all_matches_importance |> filter(wta_importance >= 0.125) |> nrow() # 4011 instances
 
 
