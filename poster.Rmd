@@ -1,0 +1,146 @@
+---
+title: "Pressure Point Patterns: Analyzing Tennis Strategy at the French Open"
+author:
+  - name: "Brody Pinto"
+affiliation: 
+  - "St. Lawrence University"
+  - "Department of Math, Computer Science, Statistics, and Data Science"
+  - "Advised by Dr. Matt Higham"
+column_numbers: 3
+output: 
+  posterdown::posterdown_html:
+    self_contained: true
+poster_height: "36in"
+poster_width: "48in"
+titlebox_borderwidth: "0cm"
+sectitle_textsize: "62pt"
+primary_colour: "#28405C"
+execute:
+  echo: false
+  warning: false
+---
+
+
+```{r setup, include=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE,
+                      singlespacing = TRUE)
+library(tidyverse)
+library(courtvisionr)
+```
+
+# Abstract
+
+- At the highest level of tennis, mental skill is often as — if not more — important than physical or technical ability.
+
+- This project explores how top players handle pressure situations to gain an edge over opponents.
+
+- Shot-by-shot data — including precise ball coordinates — from the French Open (the most prestigious clay court tournament) was used.
+
+- The analysis required: extensive data cleaning, parsing of match scores, joining multiple data sources.
+
+- These steps enabled the creation of visualizations showing how elite players serve and return during high-pressure points.
+
+- Key findings:
+
+  - On serve, elite players tend to stick to their strengths and play more aggressively under pressure (depending on the opponent).
+
+  - On return, elite players generally adopt a more conservative approach to their current strategy.
+
+# Data
+
+## TODO: Fill in - show data transformation, include snipped of what the final data looks like
+
+<br>
+
+# Summary Stats
+
+## TODO: Fill in - number of total matches, number of total points played, number of important points played
+
+<br>
+
+# Case 1 - Rafael Nadal Serve Locations
+
+## TODO: Fill in plot here (Nadal 2022 serves colored by break point)
+
+```{r, warning=FALSE, echo=FALSE}
+## Nadal's 2022 Run to the French Open Title:
+nadal_2022 <- filter_matches(player = "Rafael Nadal", year_of_interest = "2022")
+nadal_2022_shots <- clean_shot_level(nadal_2022)
+
+nadal_2022_serves <- nadal_2022_shots |>
+  filter(serverId == "Rafael Nadal") |>
+  filter(position == "bounce") |>
+  group_by(point_index, player2) |>
+  slice(1) |>
+  relocate(position, shot_index, x, y, z) |>
+  ungroup() |>
+  filter(pointEndType != "Faulty Serve") |>
+  filter(abs(x) < 6.410 & abs(x) > 0.5) |>
+  mutate(break_point = if_else((player1_game_score %in% c(0,15,30) & player2_game_score == 40) |
+                                 player2_game_score == "AD",
+                               true = "Break Point",
+                               false = "Not Break Point"))
+
+nadal_2022_deuce <- nadal_2022_serves |>
+  filter(court == "DeuceCourt") |>
+  mutate(x = if_else(abs(x) < 1, true = -abs(x), false = x),
+         y = if_else(abs(x) < 1, true = abs(y), false = y)) |>
+  mutate(y = if_else(x > 1, true = -y, false = y),
+         x = if_else(x > 1, true = -x, false = x)) |>
+  mutate(x = if_else(y < 0, true = -x, false = x),
+         y = if_else(y < 0, true = -y, false = y)) |>
+  # Rotate 90 degrees CCW: (x, y) -> (-y, x)
+  mutate(rot_x = -y, rot_y = x)
+
+nadal_2022_ad <- nadal_2022_serves |>
+  filter(court == "AdCourt") |>
+  mutate(x = if_else(abs(x) < 1, true = -abs(x), false = x),
+         y = if_else(abs(x) < 1, true = -abs(y), false = y)) |>
+  mutate(y = if_else(x > 1, true = -y, false = y),
+         x = if_else(x > 1, true = -x, false = x)) |>
+  # Rotate 90 degrees CCW: (x, y) -> (-y, x)
+  mutate(rot_x = -y, rot_y = x)
+
+nadal_2022_deucead <- bind_rows(nadal_2022_deuce, nadal_2022_ad)
+
+ggplot(data = nadal_2022_deucead, aes(x = rot_x, y = rot_y)) +
+  geom_density_2d_filled(show.legend = FALSE, bins = 9) +
+  geom_point(aes(color = break_point, alpha = break_point, size = break_point), show.legend = TRUE) +
+  scale_alpha_manual(name = "Break Point", values = c(1, 0.4)) +
+  scale_size_manual(name = "Break Point", values = c(1.3, 1)) +
+  scale_colour_manual(name = "Break Point", values = c("#00FFFF", "black")) +
+  scale_fill_brewer(palette = "Oranges") +
+  guides(fill = "none") +
+  draw_court() +
+  facet_wrap(~plot_label_final) +
+  labs(title = "Rafael Nadal Serve Locations - Break Points - 2022 Title Run")
+```
+
+
+<br>
+
+# Case 2 - Iga Swiatek Serve Locations
+
+## TODO: Fill in plot here (Swiatek 2023 serves colored by importance)
+
+<br>
+
+# Case 3 - Novak Djokovic Return Locations
+
+## TODO: Fill in plot here (Djokovic 2021 returns colored by importance)
+
+<br>
+
+# Key Takeaways
+
+## TODO: a couple bullets summarising key takeaways
+
+<br>
+
+# References
+
+## TODO: what should I include here?
+
+-   <font size = "2.5">Gundersen, C., A. Dewey, E. Engelhard, M. Strayer & L. Lapinski. Map the Meal Gap 2020: A Report on County and Congressional District Food Insecurity and County Food Cost in the United States in 2018. Feeding America, 2020.</font>
+-   <font size = "2.5">U.S. Census Bureau. (2020, June 25). *County Business Patterns (2018).* <https://www.census.gov/data/datasets/2018/econ/cbp/2018-cbp.html></font>
+-   <font size = "2.5">U.S. Census Bureau. (2021, October 8). *County Population by Characteristics: 2010-2019.* <https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html></font>
