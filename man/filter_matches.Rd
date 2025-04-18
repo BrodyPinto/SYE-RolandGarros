@@ -19,5 +19,5 @@ returns a point-level data frame of all matches given the specified player and y
 }
 \description{
 This is a function that finds all matches of a specified player, year, and/or round
-using the all_matches_importance dataset
+using the all_matches_importance data frame
 }

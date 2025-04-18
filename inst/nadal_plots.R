@@ -407,8 +407,17 @@ nadal_2021_returns |>
 ## his return net clearance being slightly higher in 2022
 
 ## Serve Speed:
-nadal_2022_deucead |>
-  group_by(atp_is_important, serve) |>
+serves_12 = nadal_2022_deucead |>
+  group_by(break_point, serve) |>
   summarise(avg_serve_speed = mean(ballSpeed),
-            sd_serve_speed = sd(ballSpeed))
+            sd_serve_speed = sd(ballSpeed),
+            serve_count = n())
+
+serves_total = nadal_2022_deucead |>
+  group_by(break_point) |>
+  summarise(total_serves = n())
+
+serves_joined = serves_12 |>
+  left_join(serves_total) |>
+  mutate(first_serve_percentage = serve_count / total_serves * 100)
 

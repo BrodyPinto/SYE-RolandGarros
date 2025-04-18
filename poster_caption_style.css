@@ -1,0 +1,11 @@
+/* Target figure and table captions globally */
+.caption {
+  font-size: 20pt !important;
+  text-align: center !important;
+  padding-bottom: 0em;
+  padding-top: 0em;
+}
+
+.table {
+  font-size: 32pt !important;
+}

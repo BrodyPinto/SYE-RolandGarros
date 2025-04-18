@@ -380,12 +380,34 @@ djokovic_2020_returns |>
             returns_made = sum(return_made)) |>
   mutate(prop_in_play = returns_made / count)
 
-djokovic_2021_returns |>
+return_stats = djokovic_2021_returns |>
   mutate(return_made = if_else(abs(x) <= 11.88 & abs(x) > 0 & abs(y) <= 4.11, 1, 0)) |>
   group_by(atp_is_important) |>
-  summarise(count = n(),
+  summarise(returns_hit = n(),
             returns_made = sum(return_made)) |>
-  mutate(prop_in_play = returns_made / count)
+  mutate(proportion_returns_made = returns_made / returns_hit) |>
+  rename(important_point = atp_is_important)
+
+## To make a pretty table:
+library(kableExtra)
+return_stats <- djokovic_2021_returns |>
+  mutate(return_made = if_else(abs(x) <= 11.88 & abs(x) > 0 & abs(y) <= 4.11, 1, 0)) |>
+  group_by(atp_is_important) |>
+  summarise(
+    returns_hit = n(),
+    returns_made = sum(return_made),
+    .groups = "drop"
+  ) |>
+  mutate(proportion_returns_made = returns_made / returns_hit) |>
+  rename(important_point = atp_is_important)
+
+# Pretty table with kableExtra
+return_stats |>
+  mutate(proportion_returns_made = scales::percent(proportion_returns_made, accuracy = 0.1)) |>
+  kable("html", caption = "Djokovic 2021 Return Stats by Point Importance") |>
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"), full_width = FALSE, font_size = 16) |>
+  column_spec(1, bold = TRUE) |>
+  row_spec(0, bold = TRUE, background = "#E0E0E0")
 
 ## Break Points:
 djokovic_2020_returns |>

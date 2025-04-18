@@ -1,5 +1,17 @@
 ## Task List
 
+References:
+
+- atp_importance from the deuce R package - by Kovalchik (google this)
+
+- atp_players from Jeff Sackmann - just give web address
+
+- the paper by Kovalchik
+
+- reference Roland Garros data is from InfoSys
+
+- flip server_game_scoer and server_set_score in federer_2021?
+
 ## April 10
 
 1. Tweak the break point / first serve colours and fix the coord fixed dimensions, add match scores to plot titles, order plots by round.
