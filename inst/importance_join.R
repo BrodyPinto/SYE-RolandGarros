@@ -123,6 +123,21 @@ join_ready_df <- all_matches |>
   mutate(server_game_score = server_game_score - score_diff,
          receiver_game_score = receiver_game_score - score_diff) |>
 
+  ## Flip server and receiver scores for game_score and set_score
+  mutate(
+    # Preserve original values
+    server_game_score_og = server_game_score,
+    receiver_game_score_og = receiver_game_score,
+    server_set_score_og = server_set_score,
+    receiver_set_score_og = receiver_set_score,
+
+    # Swap server and receiver scores
+    server_game_score = receiver_game_score_og,
+    receiver_game_score = server_game_score_og,
+    server_set_score = receiver_set_score_og,
+    receiver_set_score = server_set_score_og
+  ) |>
+
   ## Combine scores
   mutate(game_score = paste(server_game_score, receiver_game_score, sep = "-"),
          set_score = paste(server_set_score, receiver_set_score, sep = "-"),
@@ -160,6 +175,9 @@ all_matches_importance <- join_ready_df |>
                                      "set_score" = "game_score",
                                      "match_score" = "set_score")) |>
   relocate(game_score, set_score, match_score, atp_importance, wta_importance)
+
+## Save the file:
+usethis::use_data(all_matches_importance, overwrite = TRUE)
 
 ## this is as good as I'm going to get this, 98 NA's out of 39,000 observations
 ## players involved in NA importance:
