@@ -232,7 +232,7 @@ ggplot(data = nadal_2022_deucead, aes(x = rot_x, y = rot_y)) +
 
 - Nadal primarily targets his opponent's backhand.
 
-- When facing a break point, Nadal generally follows the same serving strategy, with more aggressive serve locations (closer to the lines).
+- For important points, Nadal generally follows the same serving strategy, with more aggressive serve locations (closer to the lines).
 
 - Against strong returners (e.g., Djokovic and Zverev), Nadal's serve locations are less predictable.
 

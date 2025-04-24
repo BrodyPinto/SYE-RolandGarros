@@ -1,0 +1,100 @@
+---
+title: "Pressure Point Patterns: A Look Into Tennis Tactics at the French Open"
+author: "Brody Pinto"
+format: html
+---
+
+## Table of Contents
+
+## Abstract
+
+- In tennis, mental skill is just as important as physical ability.
+
+- This project explores how elite players handle pressure situations (i.e., important points) to gain an edge over their opponents.
+
+- Shot trajectory data - with precise ball coordinates - from the 2019-2023 French Open tournaments was used.
+
+- The analysis required: extensive data cleaning, parsing of match scores, joining multiple data sources.
+
+- These steps enabled the creation of visualizations showing how elite players serve and return during high-pressure points.
+
+- **Key findings:**
+
+  - On serve, elite players tend to stick to their strengths and even play more aggressively under pressure (depending on their opponent).
+
+  - On return, elite players generally adopt a more conservative approach to their current strategy.
+
+## 1. Introduction
+
+- Outline the rest of the paper.
+
+- Motivation: Pressure points are few and far between but have a disproportionately large impact on the state of the entire match.
+
+- Prior work: Kovalchik’s paper, other work?
+
+- Research question: How do elite players adapt tactically under pressure?
+
+## 2. Data and Methods
+
+### 2.1 Data Sources
+- Primary data source: Infosys tracking data (Roland Garros)
+
+  - talk about scraping?
+
+- `atp_importance` from the `deuce` package
+
+- Player data from Jeff Sackmann
+
+### 2.2 Data Processing
+- talk about all the functions and how they work together to build the all_matches dateset I use in filter_matches().
+
+- Standardizing player names and match scores for importance joining with all_matches to create the final all_matches_importance dataset = the final state of data prep
+
+- Coordinate normalization and court alignment to keep aspect ratio / scale of the court
+
+### 2.3 Data Summary Tables
+
+### 2.4 Visualization
+- 2D density plots of serve and return locations
+
+- Score/important point and opponent strategy comparisons
+
+## 3. Case Studies
+### 3.1 Rafael Nadal (2022)
+- Serves on break points: more margin, similar targets
+
+### Zverev Serves
+
+### 3.2 Iga Swiatek (2023)
+- Consistent center targeting under pressure
+
+### 3.3 Novak Djokovic (2021)
+- Elite return depth and accuracy on important points
+
+### Someone else for returns
+
+## 4. Discussion (embed into Case Studies section, general discussion can go into Conclusion)
+- Tactical trends: aggression vs. safety, overall tactical change between important / non-important points
+
+- Differences across ATP and WTA examples
+
+## 5. Conclusion
+- Players adapt differently under pressure:
+
+  - On **serve**, Nadal and Swiatek often maintain their strategy but play *more aggressively* on important points.
+  
+  - On **return**, Djokovic prioritizes consistency in high-stakes moments.
+
+- Only **~17%** of all points are labeled as important, but they have a disproportionately large impact on match outcomes.
+
+- **Shot placement data** allows us to visualize elite players' serve and return patterns in response to pressure, enabling more nuanced performance analysis.
+
+- Future work - rally shots instead of just serve/return
+
+## References
+- Kovalchik, S. A. (2020). *Measuring Clutch Performance in Professional Tennis*. IJAS.
+- `deuce` R package
+- Jeff Sackmann's player and match data
+- Infosys Match Centre data
+
+
