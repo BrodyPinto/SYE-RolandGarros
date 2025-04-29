@@ -1,0 +1,191 @@
+---
+title: "Pressure Point Patterns: A Look Into Tennis Tactics at the French Open"
+author: "Brody Pinto"
+format: pdf
+execute: 
+  echo: false
+  warning: false
+---
+
+```{r}
+## Load libraries
+library(tidyverse)
+library(courtvisionr)
+library(kableExtra)
+library(jsonlite)
+```
+
+
+## Table of Contents
+
+## Abstract
+
+At the highest level of tennis, a player's mental skillset is as -- if not, more -- important than their physical and technical skillset. Do the elite players of the sport handle pressure situations differently that sets them apart from the rest of the players? The goal of this paper is to tackle this question by leveraging shot placement data (the exact coordinates of the ball using trajectory-tracking technology) collected during the French Open -- the most prestigious clay court tournament in the world. The data preparation process involved data scraping, detail-oriented data cleaning and parsing, and joining and filtering functions. Using the processed data, my goal was to create meaningful visualizations that effectively illustrate how the best players in the world serve and return on the most important points. This paper will highlight that for these high-pressure points, the elite players tend to stick to their strengths and even play more aggressively when they're serving, however on the return of serve, elite players generally adopt a more conservative approach to their current strategy.
+
+## Introduction
+
+In the game of tennis, its unique scoring system sets it apart from sports with more traditional scoring structures. Tennis scoring can be compared to a Chinese nesting doll: a player must win points to win a game, win games to win a set, and win sets to win a match. This layered system creates several natural "reset" points throughout a match (e.g., after the conclusion of a game or set), offering players a chance to regain momentum if they start poorly. However, it also creates specific points that carry significantly more weight — particularly those late in a set when the score is close. These pressure points — referred to as *important points* later in the paper — are relatively rare but have a disproportionately large impact on the trajectory of an entire match.
+
+The importance of handling these pressure moments cannot be overstated. In the words of Roger Federer during his recent commencement address at Dartmouth College, he explained to the audience that he -- one of the the greatest champions in the history of tennis -- has only won 54% of the points he played, but he ended up winning nearly 80% of all his matches throughout his career. Winning in tennis is not about dominance at every moment; it is about winning the right points at the right time. This statistic — coming from Federer himself — underscores the idea that the difference between the game's legends and their competitors often lies in their ability to excel in the moments that matter most.
+
+While traditional tennis statistics — like first serve percentage or total winners — offer a high-level view of performance, they rarely capture the nuances of tactical adaptations during pressure points. As a solo sport, the gravitational pull of pressure during big moments is intense, and some players have proved they can handle it better than others. While mental toughness is often cited as the key to thriving under pressure, it has historically been difficult to measure objectively. As Kovalchik notes in her study of clutch performance and mental toughness in top tennis athletes, "the ability to perform well under pressure is often attributed to mental toughness, yet objective evidence of this phenomenon has remained elusive." This gap — the need to identify and visualize the tactical signs of mental resilience — is precisely what this paper aims to explore.
+
+While traditional tennis statistics — like first serve percentage or total winners — offer a high-level view of performance, they rarely capture the nuances of tactical adaptations during pressure points. As a solo sport, the gravitational pull of pressure during big moments is intense, and some players have proved they can handle it better than others. While mental toughness is often cited as the key to thriving under pressure, it has historically been difficult to measure objectively. In her study of clutch performance and mental toughness among top tennis athletes, Kovalchik points out that although mental toughness is frequently credited for strong performances in clutch moments, there has been little objective evidence to back up this belief. This gap — the need to identify and visualize the tactical signs of mental resilience — is precisely what this paper aims to explore.
+
+The goal of this project is to move beyond simple outcome-based measures and use shot placement data — capturing the exact coordinates of ball trajectories — to analyze how elite players such as Federer, Nadal, and Djokovic adapt their strategies under pressure. Rather than asking whether players succeed in important moments, this project focuses on how they succeed: by examining whether they alter their serve placement, shot selection, or return tactics during critical points. Identifying these tactical shifts offers a more complete understanding of the mental and strategic adjustments that underlie elite performance.
+
+By leveraging modern tracking technology, point importance scoring models, and visual analysis techniques, this paper brings a data-driven perspective to a topic traditionally discussed in broad, subjective terms. In doing so, it aims to provide objective evidence of how the greatest players in tennis consistently manage to win the points that shape matches — and, by extension, careers. Through careful examination of their shot patterns under pressure, this work reveals the subtle yet powerful ways that mental toughness and strategic clarity manifest themselves during the most *important* moments in tennis.
+
+## Data and Methods
+
+### Data and Variables of Interest
+
+**CourtVision Data**
+
+The foundation and motivation for this project lies in the powerful data collected at the French Open using Infosys CourtVision tracking technology. We scraped this data from the Roland Garros (French Open) website from the years of 2019 through 2023. Every match recorded is stored as it's individual data set which we stored as a `.csv` file. In each match's data set, each row represents an individual point in the match. In this project, there is data from 180 matches.
+
+<br>
+
+`trajectoryData` **Variable**
+
+This CourtVision data includes a uniquely important variable, aptly named `trajectoryData`, which includes the exact coordinates (`x`, `y`, `z`) and `position` of every ball hit from the the majority of stadium-court and some satellite-court matches at the French Open. The `x` coordinate represents the length of the court, the `y` coordinate represents the width of the court, the `z` coordinate represents the height of the ball above the ground (see Figure 1), and `position` refers to the location of the ball when the coordinates are tracked: either at contact (`hit`), at the ball's peak (`peak`), when the ball crosses or hits the net (`net`), when the ball bounces (`bounce`), and the last tracked location of the ball (`last`). All coordinates are measured in meters. The primary focus of this project is on the *shot placement* of the serve and return of serve, meaning we want to use the `x` and `y` coordinates at the `bounce` position on the first and second `hit` of each point to get the serve location and return location, respectively.
+
+```{r, fig.cap="Bird's eye view of a tennis court. The dashed line represents the net."}
+# Create a dataframe for court regions
+court_rects <- data.frame(
+  xmin = c(-5.02, -4.11, 0, 0, 4.11),
+  xmax = c(-4.11, 0, 0, 4.11, 5.02),
+  ymin = c(-11.88, -11.88, -11.88, -11.88, -11.88),
+  ymax = c(11.88, 11.88, 11.88, 11.88, 11.88),
+  fill = factor(c(1, 1, 1, 1, 1))  # Fill values to differentiate regions
+)
+
+ggplot() +
+  geom_rect(data = court_rects, aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = fill), alpha = 0.4) +
+  draw_court() +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  ) +
+  labs(x = "x (meters)", y = "y (meters)") +
+  scale_fill_brewer(palette = "Oranges") +
+  scale_x_continuous(breaks = c(-4.11, 0, 4.11)) +
+  scale_y_continuous(breaks = c(-11.88, -6.4, 0, 6.4, 11.88)) +
+  guides(fill = "none")
+
+```
+
+<br>
+
+**Other Variables of Interest**
+
+`matchScore` is the score of the match after the point was played -- this variable needed a significant amount of processing to get it formatted for the importance joining (see Data Processing section). 
+
+`atp_importance` and `wta_importance` are the calculated importance values of the current point based on the current score of the match. These values are calculated for every possible tennis score and stored in the `atp_importance` data set in Kovalchik's `deuce` package. Point importance is calculated differently for ATP and WTA matches since ATP matches are best 3 out of 5 sets while WTA matches are best 2 out of 3 sets. Regardless, the calculation for point importance follows the same general probability equation:
+
+$P(\text{server wins the match} \mid \text{server wins the point}) - P(\text{server wins the match} \mid \text{receiver wins the point})$.
+
+`serverId`, `receiverId`, and `scorerId` the unique identification number of the player serving, receiving, and who won the point, respectively. These values are used to join with the player information data set from Jeff Sackmann's player file to get player names.
+
+### Data Processing
+
+**Match Score Parsing and Augmentation**
+
+<br>
+
+**Trajectory Data Parsing**
+
+The `trajectoryData` variable was initially stored as a JSON object. The following example is the trajectory data of a missed serve that crossed the net and landed outside of the service box:
+
+<pre>
+  [{'x': 11.54, 'y': -1.039, 'z': 2.568, 'position': 'hit'},
+  {'x': 11.54, 'y': -1.039, 'z': 2.568, 'position': 'peak'},
+  {'x': 0.0, 'y': 0.915, 'z': 0.946, 'position': 'net'},
+  {'x': 3.501, 'y': 3.428, 'z': 0.038, 'position': 'bounce'},
+  {'x': 5.172, 'y': 4.968, 'z': 0.047, 'position': 'last'}]
+</pre>
+
+I parsed this JSON object using the available delimiters to obtain the following cleaner form (see `clean_shot_level()` in Appedix for the R code):
+
+```{r}
+# JSON-style data as a string
+trajectory_json <- '[{"x": 11.54, "y": -1.039, "z": 2.568, "position": "hit"},
+                     {"x": 11.54, "y": -1.039, "z": 2.568, "position": "peak"},
+                     {"x": 0.0, "y": 0.915, "z": 0.946, "position": "net"},
+                     {"x": 3.501, "y": 3.428, "z": 0.038, "position": "bounce"},
+                     {"x": 5.172, "y": 4.968, "z": 0.047, "position": "last"}]'
+
+# Convert to a data frame
+trajectory_df <- fromJSON(trajectory_json) |>
+  select(Position = position, x, y, z)
+
+# Render LaTeX-safe table
+kable(trajectory_df, 
+      format = "latex", 
+      booktabs = TRUE, 
+      align = "c")
+```
+
+<br>
+
+**Importance Joining**
+
+<br>
+
+**Drawing the Court**
+
+- talk about all the functions and how they work together to build the all_matches dateset I use in filter_matches().
+
+- Standardizing player names and match scores for importance joining with all_matches to create the final all_matches_importance dataset => the final state of data prep
+
+  - how importance is caluculated
+
+- Coordinate normalization and court alignment to keep aspect ratio / scale of the court
+
+### 2.3 Data Summary Tables
+
+### 2.4 Visualization
+- 2D density plots of serve and return locations
+
+- Score/important point and opponent strategy comparisons
+
+## 3. Case Studies
+### 3.1 Rafael Nadal (2022)
+- Serves on break points: more margin, similar targets
+
+### Zverev Serves
+
+### 3.2 Iga Swiatek (2023)
+- Consistent center targeting under pressure
+
+### 3.3 Novak Djokovic (2021)
+- Elite return depth and accuracy on important points
+
+### Someone else for returns
+
+## 4. Discussion (embed into Case Studies section, general discussion can go into Conclusion)
+- Tactical trends: aggression vs. safety, overall tactical change between important / non-important points
+
+- Differences across ATP and WTA examples
+
+## 5. Conclusion
+- Players adapt differently under pressure:
+
+  - On **serve**, Nadal and Swiatek often maintain their strategy but play *more aggressively* on important points.
+  
+  - On **return**, Djokovic prioritizes consistency in high-stakes moments.
+
+- Only **~17%** of all points are labeled as important, but they have a disproportionately large impact on match outcomes.
+
+- **Shot placement data** allows us to visualize elite players' serve and return patterns in response to pressure, enabling more nuanced performance analysis.
+
+- Future work - rally shots instead of just serve/return
+
+## References
+- Kovalchik, S. A. (2020). *Measuring Clutch Performance in Professional Tennis*. IJAS.
+- `deuce` R package
+- Jeff Sackmann's player and match data
+- Infosys Match Centre data
+
+
