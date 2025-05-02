@@ -66,7 +66,9 @@ By leveraging tennis tracking technology, point importance scoring models, and v
 The foundation and motivation for this project lies in the powerful data collected at the French Open using Infosys CourtVision tracking technology. We scraped this data from the Roland Garros (French Open) website from the years of 2019 through 2023. Every match recorded is stored as an individual `.csv` file. In each `.csv` file, each row represents an individual point in the match. In this project, there are data from 180 matches which I combined into one main dataset I called `all_matches` which contains 45,672 rows.
 
 ### `trajectoryData` Variable
-This CourtVision data includes a uniquely important variable, aptly named `trajectoryData`, which includes the exact coordinates (`x`, `y`, `z`) and `position` of every ball hit from the majority of stadium-court and some satellite-court matches at the French Open. The `x` coordinate represents the length of the court, the `y` coordinate represents the width of the court, the `z` coordinate represents the height of the ball above the ground (see Figure 1), and `position` refers to the location of the ball when the coordinates are tracked: either at contact (`hit`), at the ball's peak (`peak`), when the ball crosses or hits the net (`net`), when the ball bounces (`bounce`), and the last tracked location of the ball (`last`). All coordinates are measured in meters. The primary focus of this project is on the *shot placement* of the serve and return of serve, meaning we want to use the `x` and `y` coordinates at the `bounce` position on the first and second `hit` of each point to get the serve location and return location, respectively.
+This CourtVision data includes a uniquely important variable, aptly named `trajectoryData`, which includes the exact coordinates (`x`, `y`, `z`) and `position` of every ball hit from the majority of stadium-court and some satellite-court matches at the French Open. The `x` coordinate represents the length of the court, the `y` coordinate represents the width of the court, the `z` coordinate represents the height of the ball above the ground, and `position` refers to the location of the ball when the coordinates are tracked: either at contact (`hit`), at the ball's peak (`peak`), when the ball crosses or hits the net (`net`), when the ball bounces (`bounce`), and the last tracked location of the ball (`last`). All coordinates are measured in meters from the center of the court shown in Figure 1.
+
+The primary focus of this project is on the *shot placement* of the serve and return of serve, meaning we want to use the `x` and `y` coordinates at the `bounce` position on the first and second `hit` of each point to get the serve location and return location, respectively.
 
 ```{r, fig.cap="Bird's eye view of a tennis court. The dashed line represents the net. Refer to draw_court() in the Appendix for R code for drawing the scaled court.", fig.align="center"}
 court_rects <- data.frame(
@@ -181,13 +183,12 @@ trajectory_json <- '[{"x": 11.54, "y": -1.039, "z": 2.568, "position": "hit"},
 trajectory_df <- fromJSON(trajectory_json) |>
   select(Position = position, x, y, z)
 
-# Render LaTeX-safe table
 kable(trajectory_df, 
       format = "latex", 
       booktabs = TRUE, 
       align = "c", 
-      caption = "Formatted trajectory data after cleaning.") |>
-  kable_styling(position = "center", latex_options = "hold_position")
+      caption = "Formatted trajectory data after cleaning, measurements are in meters. For reference, the net height is 0.914 meters in the center (x = 0, y = 0, z = 0.914).") |>
+  kable_styling(latex_options = c("hold_position"))
 
 ```
 
