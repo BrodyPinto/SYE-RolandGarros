@@ -148,9 +148,11 @@ gauff_2022_returns <- gauff_2022_shots |>
          x = if_else(x < 0, true = -x, false = x),
          serve = as_factor(serve),
          serve = fct_relevel(serve, "1","2")) |>
-  relocate(position, shot_index, x, y, z)
+  relocate(position, shot_index, x, y, z) |>
+  # Rotate 90 degrees CCW: (x, y) -> (-y, x)
+  mutate(rot_x = -y, rot_y = x)
 
-ggplot(data = gauff_2022_returns, aes(x = x, y = y)) +
+ggplot(data = gauff_2022_returns, aes(x = rot_x, y = rot_y)) +
   geom_density_2d_filled(show.legend = FALSE, bins = 9) +
   geom_point(alpha = 0.6, size = 1.2, show.legend = TRUE, aes(color = serve)) +
   scale_color_manual(name = "Serve Type", values = c("black", "green3")) +
@@ -158,9 +160,7 @@ ggplot(data = gauff_2022_returns, aes(x = x, y = y)) +
   guides(fill = "none") +
   draw_court() +
   facet_wrap(~player2) +
-  labs(title = "Coco Gauff Return Locations - 2022 Title Run") +
-  coord_flip() +
-  scale_y_reverse()
+  labs(title = "Coco Gauff Return Locations - 2022 Title Run")
 
 ## Joining for net clearance
 gauff_2022_returns_clearance <- gauff_2022_shots |>
@@ -169,14 +169,16 @@ gauff_2022_returns_clearance <- gauff_2022_shots |>
   group_by(point_index, player2) |>
   slice(2) |>
   filter(net_clearance > 0) |>
-  relocate(net_clearance, position, shot_index, x, y, z)
+  relocate(net_clearance, position, shot_index, x, y, z) |>
+  # Rotate 90 degrees CCW: (x, y) -> (-y, x)
+  mutate(rot_x = -y, rot_y = x)
 
 gauff_2022_returns_joined <- left_join(gauff_2022_returns, gauff_2022_returns_clearance,
                                          by = c("match_id", "set", "game", "point", "hit_count")) |>
   relocate(net_clearance.y)
 
 ## THIS IS COOL 😎
-ggplot(data = gauff_2022_returns_joined, aes(x = x.x, y = y.x)) +
+ggplot(data = gauff_2022_returns_joined, aes(x = rot_x.x, y = rot_y.x)) +
   geom_density_2d_filled(show.legend = FALSE, bins = 9) +
   geom_point(alpha = 0.8, size = 1.2, show.legend = TRUE, aes(color = net_clearance.y)) +
   scale_color_viridis_c(name = "Net Clearance (m)", option = "viridis") +
@@ -184,12 +186,10 @@ ggplot(data = gauff_2022_returns_joined, aes(x = x.x, y = y.x)) +
   guides(fill = "none") +
   draw_court() +
   facet_wrap(~player2.x) +
-  labs(title = "Coco Gauff Return Locations - 2022 Title Run") +
-  coord_flip() +
-  scale_y_reverse()
+  labs(title = "Coco Gauff Return Locations - 2022 Title Run")
 
 ## COLORING BY BREAK POINT
-ggplot(data = gauff_2022_returns_joined, aes(x = x.x, y = y.x)) +
+ggplot(data = gauff_2022_returns_joined, aes(x = rot_x.x, y = rot_y.x)) +
   geom_density_2d_filled(show.legend = FALSE, bins = 9) +
   geom_point(alpha = 0.6, size = 1.2, show.legend = TRUE, aes(color = breakPoint.x)) +
   scale_colour_manual(name = "Break Point", values = c("black", "green")) +
@@ -197,9 +197,7 @@ ggplot(data = gauff_2022_returns_joined, aes(x = x.x, y = y.x)) +
   guides(fill = "none") +
   draw_court() +
   facet_wrap(~player2.x) +
-  labs(title = "Coco Gauff Return Locations - 2022 Title Run") +
-  coord_flip() +
-  scale_y_reverse()
+  labs(title = "Coco Gauff Return Locations - 2022 Title Run")
 
 ## COLORING BY IMPORTANCE
 ggplot(data = gauff_2022_returns_joined, aes(x = x.x, y = y.x)) +
@@ -215,17 +213,15 @@ ggplot(data = gauff_2022_returns_joined, aes(x = x.x, y = y.x)) +
   scale_y_reverse()
 
 ## COLORING BY IS_IMPORTANT
-ggplot(data = gauff_2022_returns_joined, aes(x = x.x, y = y.x)) +
+ggplot(data = gauff_2022_returns_joined, aes(x = rot_x.x, y = rot_y.x)) +
   geom_density_2d_filled(show.legend = FALSE, bins = 9) +
-  geom_point(alpha = 0.6, size = 1.2, show.legend = TRUE, aes(color = wta_is_important.x)) +
-  scale_colour_manual(name = "Is important?", values = c("black", "green")) +
+  geom_point(alpha = 0.6, size = 1.2, show.legend = FALSE, aes(color = wta_is_important.x)) +
+  scale_colour_manual(name = "Is important?", values = c("black", "#00FFFF")) +
   scale_fill_brewer(palette = "Oranges") +
   guides(fill = "none") +
   draw_court() +
-  facet_wrap(~player2.x) +
-  labs(title = "Coco Gauff Return Locations - 2022 Title Run") +
-  coord_flip() +
-  scale_y_reverse()
+  facet_wrap(~plot_label_final.x, nrow = 1) +
+  labs(title = "Coco Gauff Return Locations - 2022 Title Run")
 
 ## 2021 Quarterfinalist Run:
 gauff_2021_returns <- gauff_2021_shots |>
