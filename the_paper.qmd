@@ -46,7 +46,7 @@ library(jsonlite)
 \clearpage
 
 # Abstract
-At the highest level of tennis, a player's mental skillset is as -- if not, more -- important than their physical and technical skillset. Do the elite players of the sport handle pressure situations differently that sets them apart from the rest of the players? The goal of this paper is to tackle this question by leveraging shot placement data (the exact coordinates of the ball using trajectory-tracking technology) collected during the French Open -- the most prestigious clay court tournament in the world. The data preparation process involved data scraping, detail-oriented data cleaning and parsing, and joining and filtering functions. Using the processed data, my goal was to create meaningful visualizations that effectively illustrate how the best players in the world serve and return on the most important points. This paper will highlight that for these high-pressure points, the elite players tend to stick to their strengths and even play more aggressively when serving, however, on the return of serve, elite players generally adopt a more conservative approach to their current strategy.
+At the highest level of tennis, a player's mental skillset is as -- if not more -- important than their physical and technical abilities. This paper investigates whether elite players manage pressure situations differently, and how those responses set them apart from their competition. Using shot placement data from the French Open -- captured via trajectory-tracking technology -- this study explores tactical decision-making on the most important points in a match. After a rigorous data preparation process, including scraping, cleaning, and merging datasets, I created effective visualizations of serve and return patterns under pressure. In this paper, I examine six case studies that reveal how elite players rarely abandon their core strategies under pressure. Instead, they refine them -- choosing either increased aggression or tighter consistency, depending on the situation. On serve, this often means doubling down on tried and true patterns; on return, it typically involves minimizing risk. The ability to execute with clarity and precision in these high-stakes moments, more than the strategy itself, is what ends up separating great players from true champions.
 
 # Introduction
 In the game of tennis, its unique scoring system sets it apart from sports with more traditional scoring structures. Tennis scoring can be compared to a Chinese nesting doll: a player must win points to win a game, win games to win a set, and win sets to win a match. This layered system creates several natural "reset" points throughout a match (e.g., after the conclusion of a game or set), offering players a chance to regain momentum if they start poorly. However, it also creates specific points that carry significantly more weight -- particularly those late in a set when the score is close. These pressure points -- referred to as *important points* later in the paper -- are relatively rare but have a disproportionately large impact on the trajectory of an entire match.
@@ -319,6 +319,14 @@ Out of the 180 total matches tracked in this dataset, a total of 33,644 points w
 
 # Case Studies
 ## Serve Placement Analysis
+While important points make up just a fraction of total points played, their outsized influence on match outcomes makes them especially worthy of closer examination. To uncover how top players respond in these high-pressure moments, we now shift focus from raw statistical counts to tactical behaviors -- beginning with how they use one of their most controlled weapons: the serve.
+
+One of the clearest opportunities a player has to control a point is on serve. At the professional level, the serve is not just a way to start the point -- it’s a weapon and often the first step in an intentional tactical sequence. Under pressure, however, even the most elite servers must make a choice: do they lean into their strengths, or do they adapt in response to the moment?
+
+This section explores that decision through the lens of three standout performances at the French Open: Rafael Nadal’s 2022 title run, Alexander Zverev’s 2021 semifinal campaign, and Iga Świątek’s dominant 2023 championship. Each case study provides a unique perspective on how elite players adjust their serving strategy -- both in terms of placement and speed -- on important points compared to routine ones.
+
+As we’ll see, some players double down on their current strategy and increase their aggression under pressure while others choose to add margin. These serve placement visuals shed light on how pressure shapes elite tactics and highlights how champions respond to critical moments with clarity.
+
 ### Rafael Nadal Serves (2022 Title Run)
 ```{r FIGURE2, fig.width = 6, fig.align = 'center', fig.cap = "Rafael Nadal's serve placement in his last five rounds to the 2022 French Open title. Blue dots represent serves on important points; black dots represent serves on non-important points. Note that the dots above the net are all serves to the deuce court and the dots below the net are all serves to the ad court."}
 ## Nadal's 2022 Run to the French Open Title:
@@ -361,22 +369,6 @@ nadal_2022_ad <- nadal_2022_serves |>
 
 nadal_2022_deucead <- bind_rows(nadal_2022_deuce, nadal_2022_ad)
 
-# ggplot(data = nadal_2022_deucead, aes(x = rot_x, y = rot_y)) +
-#   geom_density_2d_filled(show.legend = FALSE, bins = 9) +
-#   geom_point(aes(color = break_point, alpha = break_point, size = break_point), show.legend = FALSE) +
-#   scale_alpha_manual(name = "Break Point?", values = c(0.9, 0.4)) +
-#   scale_size_manual(name = "Break Point?", values = c(3.5, 2.5)) +
-#   scale_colour_manual(name = "Break Point?", values = c("#00FFFF", "black")) +
-#   scale_fill_brewer(palette = "Oranges") +
-#   guides(fill = "none") +
-#   draw_court() +
-#   facet_wrap(~plot_label_final, nrow = 1) +
-#   labs(title = "Rafael Nadal Serve Locations - Break Points - 2022 Title Run") +
-#   theme(
-#     plot.title = element_text(size = 37, face = "bold", hjust = 0.5),
-#     strip.text = element_text(size = 19)     # Facet labels
-#   )
-
 ggplot(data = nadal_2022_deucead, aes(x = rot_x, y = rot_y)) +
   geom_density_2d_filled(show.legend = FALSE, bins = 9) +
   geom_point(aes(color = atp_is_important, alpha = atp_is_important, size = atp_is_important), show.legend = FALSE) +
@@ -387,14 +379,16 @@ ggplot(data = nadal_2022_deucead, aes(x = rot_x, y = rot_y)) +
   guides(fill = "none") +
   draw_court() +
   facet_wrap(~plot_label_final, nrow = 1) +
-  labs(title = "Rafael Nadal Serve Locations - Important Points - 2022 Title Run") +
+  labs(title = "Rafael Nadal Serve Placement - Important Points - 2022 Title Run") +
   theme(
     plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
     strip.text = element_text(size = 7)     # Facet labels
   )
 ```
 
-- Serves on important points: more margin, similar targets
+Nadal’s serve placement throughout his 2022 French Open run offers a masterclass in tactical consistency under pressure. His primary strategy is clear: relentlessly target his opponent’s backhand side. This approach is especially pronounced in the final against Casper Ruud, whose backhand is a known weakness. The resulting score in the final (6-3, 6-3, 6-0) is reflective of both the effectiveness of Nadal's strategy, his ability to execute this strategy to a tee, and his dominant -- and honestly intimidating -- reputation on the red clay.
+
+Across all matches in this 2022 title run (one out of his fourteen titles over the course of his record-breaking career), Nadal largely sticks with his established patterns even on important points -- but he does so with greater precision and slightly more risk. This is most evident in his quarterfinal match against Novak Djokovic, where his serve locations on important points are clustered closer to the lines. However, against elite returners like Djokovic and Zverev, Nadal's patterns show more variety, likely reflecting an awareness of their ability to anticipate and redirect familiar serves. This subtle unpredictability under pressure is a hallmark of Nadal’s tactical brilliance and of his dominance on the red clay.
 
 ### Alexander Zverev Serves (2021 Semifinal Run)
 ```{r FIGURE3, fig.width = 6, fig.align = 'center', fig.cap = "Alexander Zverev's serve placement in his last four rounds to the 2021 French Open semifinal. Blue dots represent serves on break points; black dots represent serves on non-break points."}
@@ -449,16 +443,34 @@ ggplot(data = zverev_2021_deucead, aes(x = rot_x, y = rot_y)) +
   guides(fill = "none") +
   draw_court() +
   facet_wrap(~plot_label_final, nrow = 1) +
-  labs(title = "Alexander Zverev Serve Locations - Break Points - 2021 Semifinal Run") +
+  labs(title = "Alexander Zverev Serve Placement - Break Points - 2021 Semifinal Run") +
   theme(
     plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
     strip.text = element_text(size = 7)     # Facet labels
   )
 ```
 
-### Iga Swiatek Serves (2023 Title Run)
-```{r FIGURE4, fig.width = 6, fig.align = 'center', fig.cap = "Iga Swiatek's serve placement in her last four rounds to the 2023 French Open title. Blue dots represent serves on important points; black dots represent serves on non-important points."}
-## Swiatek's 2023 Run to the French Open Title:
+Zverev’s serve patterns present a sharp contrast to Nadal’s. Rather than favoring one side, Zverev displays a strikingly bimodal pattern, targeting both corners of the service box equally -- a tendency especially apparent in his five-set semifinal against Stefanos Tsitsipas. 
+
+Like Nadal, however, Zverev does not deviate from his primary tactics on pressure points, but his locations get bolder. Not only does his placement hug the sidelines more tightly on break points, but his serve speed increases as well. On average, Zverev’s first serve speed jumps by about 5 km/h when facing break points -- a sign that he’s leaning into his biggest weapon when it matters most (Table 5). In the men’s game, where just one break of serve can tilt an entire set or match, this willingness to go bigger under pressure reflects a calculated risk that often pays off.
+
+```{r TABLE5}
+## Serve Speed:
+zverev_serve_speed <- zverev_2021_deucead |>
+  filter(serve == 1) |>
+  group_by(breakPoint) |>
+  summarise(`Average Serve Speed` = round(mean(ballSpeed), 1),
+            `Standard Deviation` = round(sd(ballSpeed), 1))
+
+kable(zverev_serve_speed, 
+      format = "latex", booktabs = TRUE, align = "c",
+      caption = "Zverev's 1st serve speed (km/h) from the 2021 French Open.") |>
+  kable_styling(position = "center", latex_options = "hold_position")
+```
+
+### Iga Świątek Serves (2023 Title Run)
+```{r FIGURE4, fig.width = 6, fig.align = 'center', fig.cap = "Iga Świątek's serve placement in her last four rounds to the 2023 French Open title. Blue dots represent serves on important points; black dots represent serves on non-important points."}
+## Świątek's 2023 Run to the French Open Title:
 swiatek_2023 <- filter_matches(player = "Iga Swiatek", year_of_interest = "2023")
 swiatek_2023_shots <- clean_shot_level(swiatek_2023)
 
@@ -515,9 +527,17 @@ ggplot(data = swiatek_2023_deucead, aes(x = rot_x, y = rot_y)) +
   )
 ```
 
-- Consistent center targeting under pressure
+Świątek’s serve strategy offers a compelling contrast to both ATP examples. Rather than consistently aiming for the corners, she targets the center of the box with “body serves” that jam her opponent and reduce their return angles. This high-margin strategy is especially visible in the early rounds of her 2023 title run. 
+
+Yet even Świątek exhibits a subtle shift under pressure. While she maintains her central placement in most matches, her final against Karolína Muchová tells a slightly different story. With the match hanging in the balance, Świątek opted to go out wide more frequently on important points, a possible indication of both the heightened pressure and the need to disrupt her opponent’s rhythm. The fact that her serve strategy evolves in the final round, while remaining grounded in her broader approach, highlights her tactical flexibility and mental acuteness when the pressure mounts -- an incredibly valuable trait that sets her apart from the rest of the WTA.
+
+Together, these case studies reveal a common thread: elite players rarely abandon their core serving strategies under pressure. Instead, they double down with heightened precision, increased aggression, or subtle unpredictability, depending on their opponent and the context. But when players are on the receiving end, the question becomes: how do the game’s best adjust their return strategies when their opponents are serving even more aggressively when the pressure is on? The next section explores this dynamic by analyzing return placement on important points across several noteworthy case studies.
 
 ## Return Placement Analysis
+While the serve is about initiating control in the point, the return is about reclaiming it. Unlike on serve, where we observed elite players ramping up aggression under pressure, returners tend to embrace a different strategy: one rooted in discipline and consistency.
+
+To highlight this, we'll analyze the return patterns of Novak Djokovic -- debatably the greatest returner of all time -- during his 2021 title run, Stefanos Tsitsipas in his 2021 final appearance, and Coco Gauff during her impressive journey to the 2022 French Open final. Their performances reveal a shared tactical blueprint: prioritize consistency, target high-percentage areas, and apply relentless pressure by simply keeping the ball in play on the biggest points -- something that Novak Djokovic does at the highest level and has become a staple of his excellence on the tennis court.
+
 ### Novak Djokovic Returns (2021 Title Run)
 ```{r FIGURE5, fig.width = 6, fig.align = 'center', fig.cap = "Novak Djokovic's return placement in his last five rounds to the 2021 French Open title. Blue dots represent returns on break points; black dots represent returns on non-break points."}
 ## Djokovic's 2021 Run to the Title, defeating Stefanos Tsitsipas in the Final
@@ -552,23 +572,6 @@ djokovic_2021_returns_joined <- left_join(djokovic_2021_returns, djokovic_2021_r
                                           by = c("match_id", "set", "game", "point", "hit_count")) |>
   relocate(net_clearance.y)
 
-# ## COLORING BY IS_IMPORTANT
-# ggplot(data = djokovic_2021_returns_joined, aes(x = rot_x.x, y = rot_y.x)) +
-#   geom_density_2d_filled(show.legend = FALSE, bins = 9) +
-#   geom_point(show.legend = FALSE, aes(color = atp_is_important.x, alpha = atp_is_important.x, size = atp_is_important.x)) +
-#   scale_colour_manual(name = "Important Point", values = c("black", "#00FFFF")) +
-#   scale_alpha_manual(name = "Important Point", values = c(0.4, 0.9)) +
-#   scale_size_manual(name = "Important Point", values = c(2.5, 3.5)) +
-#   scale_fill_brewer(palette = "Oranges") +
-#   guides(fill = "none") +
-#   draw_court() +
-#   facet_wrap(~plot_label_final.x, nrow = 1) +
-#   labs(title = "Novak Djokovic Return Locations - Important Points - 2021 Title Run") +
-#   theme(
-#     plot.title = element_text(size = 34, face = "bold", hjust = 0.5),
-#     strip.text = element_text(size = 19)     # Facet labels
-#   )
-
 ## COLORING BY breakPoint
 ggplot(data = djokovic_2021_returns_joined, aes(x = rot_x.x, y = rot_y.x)) +
   geom_density_2d_filled(show.legend = FALSE, bins = 9) +
@@ -580,14 +583,40 @@ ggplot(data = djokovic_2021_returns_joined, aes(x = rot_x.x, y = rot_y.x)) +
   guides(fill = "none") +
   draw_court() +
   facet_wrap(~plot_label_final.x, nrow = 1) +
-  labs(title = "Novak Djokovic Return Locations - Break Points - 2021 Title Run") +
+  labs(title = "Novak Djokovic Return Placement - Break Points - 2021 Title Run") +
   theme(
     plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
     strip.text = element_text(size = 7)     # Facet labels
   )
 ```
 
-- Elite return depth and accuracy on important points
+Novak Djokovic's return game is legendary, and his 2021 French Open title run offers textbook examples of why. On break points -- arguably the most pressure-filled moments for a returner -- Djokovic didn’t miss a single return. Across 58 break point chances, he successfully put every return back into play (Table 6), applying immense pressure on his opponents to win the point outright. His returns weren’t just in -- they were placed with surgical precision, often deep and toward the backhand side.
+
+In matches against right-handed players like Berrettini and Tsitsipas, his returns frequently pinned opponents to their weaker backhand wing even though these opponents are known to have some of the best serves in the sport. Against the left-handed Rafael Nadal, Djokovic adjusted his return placement to continue targeting the lefty's backhand, reflecting a high degree of tactical awareness and adaptability. This elite depth and accuracy -- particularly under pressure -- exemplify his ability to outmaneuver opponents mentally as well as physically.
+
+```{r TABLE6}
+return_stats <- djokovic_2021_returns |>
+  mutate(return_made = if_else(abs(x) <= 11.88 & abs(x) > 0 & abs(y) <= 4.11, 1, 0)) |>
+  group_by(breakPoint) |>
+  summarise(
+    returns_hit = n(),
+    returns_made = sum(return_made),
+    .groups = "drop"
+  ) |>
+  mutate(proportion_returns_made = returns_made / returns_hit) |>
+  mutate(proportion_returns_made = round(proportion_returns_made, 2)) |>
+  rename(
+    `Break Point` = breakPoint,
+    `Returns Hit` = returns_hit,
+    `Returns Made` = returns_made,
+    `Percent Returns in Play` = proportion_returns_made
+  )
+
+kable(return_stats, 
+      format = "latex", booktabs = TRUE, align = "c",
+      caption = "Novak Djokovic's returns on break points during the 2021 French Open.") |>
+  kable_styling(position = "center", latex_options = "hold_position")
+```
 
 ### Stefanos Tsitsipas Returns (2021 Final Run)
 ```{r FIGURE6, fig.width = 6, fig.align = 'center', fig.cap = "Stefanos Tsitsipas' return placement in his last five rounds to the 2021 French Open final. Blue dots represent returns on break points; black dots represent returns on non-break points."}
@@ -634,16 +663,44 @@ ggplot(data = tsitsipas_2021_returns_joined, aes(x = rot_x.x, y = rot_y.x)) +
   guides(fill = "none") +
   draw_court() +
   facet_wrap(~plot_label_final.x, nrow = 1) +
-  labs(title = "Stefanos Tsitsipas Return Locations - Break Points - 2021 Final Run") +
+  labs(title = "Stefanos Tsitsipas Return Placement - Break Points - 2021 Final Run") +
   theme(
     plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
     strip.text = element_text(size = 7)     # Facet labels
   )
 ```
 
+Tsitsipas followed a similar return strategy during his run to the 2021 final, albeit with less precision than Djokovic. His returns often funneled through the middle of the court -- an approach that limits angles and forces the server to generate offense from neutral positions. While not as deep or targeted as Djokovic’s, Tsitsipas's returns still prioritized safety over risk.
+
+In his match against big-serving John Isner, Tsitsipas clearly focused on just making returns rather than placing them with intent, highlighting how overwhelming serve power can alter return strategy. However, like Djokovic on break points, Tsitsipas still elevated his consistency and margin for error (Table 7). Tsitsipas rarely risked going for the lines and instead aimed for high-percentage zones to build pressure and extend the rally.
+
+```{r TABLE7}
+return_stats <- tsitsipas_2021_returns |>
+  mutate(return_made = if_else(abs(x) <= 11.88 & abs(x) > 0 & abs(y) <= 4.11, 1, 0)) |>
+  group_by(breakPoint) |>
+  summarise(
+    returns_hit = n(),
+    returns_made = sum(return_made),
+    .groups = "drop"
+  ) |>
+  mutate(proportion_returns_made = returns_made / returns_hit) |>
+  mutate(proportion_returns_made = round(proportion_returns_made, 2)) |>
+  rename(
+    `Break Point` = breakPoint,
+    `Returns Hit` = returns_hit,
+    `Returns Made` = returns_made,
+    `Percent Returns in Play` = proportion_returns_made
+  )
+
+kable(return_stats, 
+      format = "latex", booktabs = TRUE, align = "c",
+      caption = "Stefanos Tsitsipas' returns on break points during the 2021 French Open.") |>
+  kable_styling(position = "center", latex_options = "hold_position")
+```
+
 ### Coco Gauff Returns (2022 Final Run)
 ```{r FIGURE7, fig.width = 6, fig.align = 'center', fig.cap = "Coco Gauff's return placement in her last four rounds to the 2022 French Open final. Blue dots represent returns on important points; black dots represent returns on non-important points."}
-## Gauff's 2022 Run to the French Open Final, losing to Iga Swiatek:
+## Gauff's 2022 Run to the French Open Final, losing to Iga Świątek:
 gauff_2022 <- filter_matches(player = "Coco Gauff", year_of_interest = "2022")
 gauff_2022_shots <- clean_shot_level(gauff_2022)
 
@@ -685,37 +742,39 @@ ggplot(data = gauff_2022_returns_joined, aes(x = rot_x.x, y = rot_y.x)) +
   guides(fill = "none") +
   draw_court() +
   facet_wrap(~plot_label_final.x, nrow = 1) +
-  labs(title = "Coco Gauff Serve Placement - Important Points - 2022 Final Run") +
+  labs(title = "Coco Gauff Return Placement - Important Points - 2022 Final Run") +
   theme(
     plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
     strip.text = element_text(size = 7)     # Facet labels
   )
 ```
 
+Coco Gauff’s return patterns during her 2022 French Open final run mirror those of her ATP counterparts. Gauff, a young but tactically mature player, embraced the same middle-targeting strategy to limit return errors and neutralize the serve. Her returns on important points were focused and consistent -- particularly in her semifinal win over Martina Trevisan, where her accuracy contributed to a dominant straight-sets victory.
 
-# Discussion (embed into Case Studies section, general discussion can go into Conclusion)
-- Tactical trends: aggression vs. safety, overall tactical change between important / non-important points
-
-- Differences across ATP and WTA examples
+However, in the final against Iga Świątek, Gauff’s return execution wavered. Her shot distribution became noticeably scattered, despite her continued attempt to hit through the middle. This contrast underscores a key insight: the strategy itself may not change under pressure, but a player’s ability to execute it consistently is what separates great competitors from elite champions on the biggest stages.
 
 # Conclusion
-- Players adapt differently under pressure:
 
-  - On **serve**, Nadal and Swiatek often maintain their strategy but play *more aggressively* on important points.
-  
-  - On **return**, Djokovic prioritizes consistency in high-stakes moments.
+While only about 20% of all points in this dataset meet the threshold to be classified as important, their influence on match outcomes is undeniable. These are the moments when the mental and tactical makeup of a player is put to the test. Through this primarily visual analysis, we’ve seen how shot placement data -- particularly from serves and returns -- can illuminate the subtle ways elite players navigate pressure differently than the great players who haven't yet broken through to greatness.
 
-- Only **~20%** of all points are labeled as important, but they have a disproportionately large impact on match outcomes.
+On serve, players like Rafael Nadal, Alexander Zverev, and Iga Świątek each responded to pressure differently, yet they shared a commitment to their core strategies. Nadal demonstrated unwavering consistency, pin-point precision, and selective risk-taking. Zverev chose to escalate his aggression, both in placement and speed. Świątek embraced a high-margin, central strategy that evolved when the stakes were highest. Together, these case studies showed that elite servers generally don't overhaul their approach under pressure -- they refine it.
 
-- **Shot placement data** allows us to visualize elite players' serve and return patterns in response to pressure, enabling more nuanced performance analysis.
+On return, the narrative was notably different. Novak Djokovic’s unmatched ability to neutralize even the biggest serves -- evidenced by his 100% return-in-play rate on break points in his 2021 title run -- underscored his status as one of the game’s greatest defenders. Tsitsipas and Gauff mirrored his discipline, opting for safety and control rather than risk. Although, as seen in Gauff’s final and Tsitsipas’ slight execution dips, even the best-laid strategies can falter without precise execution.
 
-- Future work - rally shots instead of just serve/return
+Looking ahead, this type of shot placement analysis opens the door for further research into pressure-driven tactical behavior across longer rallies. While this paper focused on serves and returns (the two most consequential shots in tennis), future work could examine elite players' shot-by-shot strategy during pressure-filled important points. This in-depth strategic analysis could include -- but is not limited to -- directional changes mid-rally, transitions to the net, and net clearance throughout the rally in response to the player's contact location. These layers would provide even deeper insights into how tactics evolve beyond the opening shots of each point.
+
+As discussed earlier, pressure rarely forces a complete overhaul of strategy -- but it does demand heightened mental acuity. What truly distinguishes elite champions from the game's top competitors is not just *what* they do under pressure, but *how* they execute their plan. The ability to maintain clarity, focus, and precision in the most important moments is what ultimately sets the legends apart. 
 
 # References
-- Kovalchik, S. A. (2020). *Measuring Clutch Performance in Professional Tennis*. IJAS.
-- deuce R package
-- Jeff Sackmann's player and match data
-- Infosys Match Centre data
+Federer, Roger. (2024, June). Commencement Address at Dartmouth College. Retrieved from https://singjupost.com/roger-federers-speech-at-2024-dartmouth-commencement-transcript/?singlepage=1
+
+Infosys. Roland Garros Match Centre Data. Retrieved from https://www.rolandgarros.com/en-us/matches/?tournamentDay=20220605
+
+Kovalchik, Stephanie A. (2016). Hot heads, cool heads, and tacticians: Measuring the mental game in tennis (ID: 1464). *MIT Sloan Sports Analytics Conference.*
+
+Kovalchik, Stephanie A. `deuce` [R package]. Retrieved from https://github.com/skoval/deuce
+
+Sackmann, Jeff. ATP match and player data. Retrieved from https://github.com/JeffSackmann/tennis_atp
 
 # Appendix
 ## `clean_point_level()`
@@ -1171,7 +1230,8 @@ join_ready_df <- all_matches |>
     ),
     scorerId = case_when(
       scorerId == "Cori Gauff" ~ "Coco Gauff",
-      scorerId == "Alejandro Davidovich Fokina" ~ "Alejandro Davidovich-Fokina",
+      scorerId == "Alejandro Davidovich Fokina" 
+      ~ "Alejandro Davidovich-Fokina",
       scorerId == "Tomas Martin Etcheverry" ~ "Tomas Martin-Etcheverry",
       scorerId == "Beatriz Haddad Maia" ~ "Beatriz Haddad-Maia",
       scorerId == "Pablo Carreno Busta" ~ "Pablo Carreno-Busta",

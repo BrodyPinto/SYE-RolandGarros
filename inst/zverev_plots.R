@@ -405,8 +405,9 @@ zverev_2021_returns |>
   mutate(prop_in_play = returns_made / count)
 
 ## Serve Speed:
-zverev_2022_deucead |>
-  group_by(atp_is_important, serve) |>
+zverev_2021_deucead |>
+  filter(serve == 1) |>
+  group_by(breakPoint) |>
   summarise(avg_serve_speed = mean(ballSpeed),
             sd_serve_speed = sd(ballSpeed))
 
