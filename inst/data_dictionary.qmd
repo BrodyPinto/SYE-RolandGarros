@@ -13,7 +13,7 @@ fetch_match_info <- function(year = "(.|\\s)*\\S(.|\\s)*",
                              player_last = "(.|\\s)*\\S(.|\\s)*",
                              round = "(.|\\s)*\\S(.|\\s)*") {
 
-  file_vec <- list.files(path = "data/")
+  file_vec <- list.files(path = "inst/data/")
   contains_year <- file_vec |>
     str_detect(pattern = as.character(year))
   contains_player <- file_vec |>
@@ -90,7 +90,14 @@ View(RG_players_2022)
 ## looks like Alcaraz is player1 and Djokovic is player2 - not sure how this is determined yet?
 test_match1 <- fetch_all_matches(year = "2023", player = "Djokovic", round = "SF")
 
-fetch_match_info(year = "2023", player = "Djokovic", round = "SF")
+fetch_match_info(year = "2022", player = "nadal")
+fetch_all_matches(year = "2022", player = "nadal", round = "F")
+
+clean_point_level(test_match1, player_of_interest = "djokovic") |> View()
+clean_point_level(nadal_2022, player_of_interest = "nadal") |> View()
+
+djok_2021 <- fetch_all_matches(year = "2021", player = "djokovic")
+clean_point_level(djok_2021, player_of_interest = "djokovic") |> View()
 
 formatted_df <- test_match1 |> 
   ## must use fetch_all_matches(player, year, round) function to get dataset with match_id variable
@@ -199,10 +206,6 @@ formatted_df <- test_match1 |>
   relocate(match_id, point_index, player1_game, player2_game, player1_set1, player2_set1)
 
 View(formatted_df)
-
-tidy_shot_level(test_match1) |> 
-  relocate(x, y, z, position, player_hit) |>
-  View()
 
 test_match1 |>
   ## must use fetch_all_matches(player, year, round) function to get dataset with match_id variable
@@ -440,6 +443,10 @@ test_match1 |>
   mutate(net_height = 0.00619 * (y^2) + 0.914) |>
   mutate(net_clearance = z - net_height) |>
   relocate(match_id, set, player1_game_score, player2_game_score, player1_set_score, player2_set_score) |>
+  View()
+
+clean_shot_level(test_match1) |> 
+  relocate(x, y, z, position, player_hit) |>
   View()
 
 ## the last point of every game has the the set score after that point has been played - is this gonna be an issue?
@@ -732,8 +739,355 @@ ggplot(data = alcaraz_receive, aes(x = x, y = y)) +
   labs(title = "Alcaraz Receiving (both Deuce and Ad)")
 ```
 
+## Fixing the score variable
+```{r}
+test_match_steph_final <- fetch_all_matches(player = "Tsitsipas", year = 2021, round = "F")
+all_matches_2022 <- fetch_all_matches(year = 2022)
 
+second_serve_points <- test_match_steph_final |>
+  ## must use fetch_all_matches(player, year, round) function to get dataset with match_id variable
+  group_by(match_id) |>
+  ## match_info parsing:
+  separate(match_info, into = c("label", "round", "opponents", "year", "court_number", "file_ending"), sep = "_") |>
+  separate(opponents, into = c("player1", "player2"), sep = "-vs-") |>
+  mutate(player1 = sub("-", " ", player1),
+         player2 = sub("-", " ", player2)) |>
+  mutate(point_index = row_number()) |>
+  ## pointId parsing:
+  separate(pointId, into = c("set", "game", "point", "serve"), sep = "_") |>
+  mutate(set = as.numeric(set),
+         game = as.numeric(game),
+         point = as.numeric(point),
+         serve = as.numeric(serve)) |>
+  ## matchScore parsing:
+  mutate(matchScore = sub("^.", "", matchScore)) |>
+  mutate(matchScore = sub(".$", "", matchScore)) |>
+  separate(matchScore, into = c("player1_set1_score",
+                                "player1_set2_score",
+                                "player1_set3_score",
+                                "player1_set4_score",
+                                "player1_set5_score",
+                                "player1_set1_tbscore",
+                                "player1_set2_tbscore",
+                                "player1_set3_tbscore",
+                                "player1_set4_tbscore",
+                                "player1_set5_tbscore",
+                                "player2_set1_score",
+                                "player2_set2_score",
+                                "player2_set3_score",
+                                "player2_set4_score",
+                                "player2_set5_score",
+                                "player2_set1_tbscore",
+                                "player2_set2_tbscore",
+                                "player2_set3_tbscore",
+                                "player2_set4_tbscore",
+                                "player2_set5_tbscore",
+                                "player1_game_score",
+                                "player2_game_score"), sep = ",") |>
+  separate(player1_set1_score, into = c("label", "player1_set1"), sep = ": ") |>
+  separate(player1_set2_score, into = c("label", "player1_set2"), sep = ": ") |>
+  separate(player1_set3_score, into = c("label", "player1_set3"), sep = ": ") |>
+  separate(player1_set4_score, into = c("label", "player1_set4"), sep = ": ") |>
+  separate(player1_set5_score, into = c("label", "player1_set5"), sep = ": ") |>
+  separate(player1_set1_tbscore, into = c("label", "player1_set1_tb"), sep = ": ") |>
+  separate(player1_set2_tbscore, into = c("label", "player1_set2_tb"), sep = ": ") |>
+  separate(player1_set3_tbscore, into = c("label", "player1_set3_tb"), sep = ": ") |>
+  separate(player1_set4_tbscore, into = c("label", "player1_set4_tb"), sep = ": ") |>
+  separate(player1_set5_tbscore, into = c("label", "player1_set5_tb"), sep = ": ") |>
+  separate(player2_set1_score, into = c("label", "player2_set1"), sep = ": ") |>
+  separate(player2_set2_score, into = c("label", "player2_set2"), sep = ": ") |>
+  separate(player2_set3_score, into = c("label", "player2_set3"), sep = ": ") |>
+  separate(player2_set4_score, into = c("label", "player2_set4"), sep = ": ") |>
+  separate(player2_set5_score, into = c("label", "player2_set5"), sep = ": ") |>
+  separate(player2_set1_tbscore, into = c("label", "player2_set1_tb"), sep = ": ") |>
+  separate(player2_set2_tbscore, into = c("label", "player2_set2_tb"), sep = ": ") |>
+  separate(player2_set3_tbscore, into = c("label", "player2_set3_tb"), sep = ": ") |>
+  separate(player2_set4_tbscore, into = c("label", "player2_set4_tb"), sep = ": ") |>
+  separate(player2_set5_tbscore, into = c("label", "player2_set5_tb"), sep = ": ") |>
+  separate(player1_game_score, into = c("label", "player1_game"), sep = ": ") |>
+  separate(player2_game_score, into = c("label", "player2_game"), sep = ": ") |>
+  mutate(player1_set1 = parse_number(player1_set1),
+         player1_set2 = parse_number(player1_set2),
+         player1_set3 = parse_number(player1_set3),
+         player1_set4 = parse_number(player1_set4),
+         player1_set5 = parse_number(player1_set5),
+         player2_set1 = parse_number(player2_set1),
+         player2_set2 = parse_number(player2_set2),
+         player2_set3 = parse_number(player2_set3),
+         player2_set4 = parse_number(player2_set4),
+         player2_set5 = parse_number(player2_set5),
+         player1_game = sub("^.", "", player1_game),
+         player1_game = sub(".$", "", player1_game),
+         player2_game = sub("^.", "", player2_game),
+         player2_game = sub(".$", "", player2_game)) |>
+  filter(serve == 2)
 
+formatted_shot_level <- test_match_steph_final |>
+  ## must use fetch_all_matches(player, year, round) function to get dataset with match_id variable
+  group_by(match_id) |>
+  ## match_info parsing:
+  separate(match_info, into = c("label", "round", "opponents", "year", "court_number", "file_ending"), sep = "_") |>
+  separate(opponents, into = c("player1", "player2"), sep = "-vs-") |>
+  mutate(player1 = sub("-", " ", player1),
+         player2 = sub("-", " ", player2)) |>
+  mutate(point_index = row_number()) |>
+  ## pointId parsing:
+  separate(pointId, into = c("set", "game", "point", "serve"), sep = "_") |>
+  mutate(set = as.numeric(set),
+         game = as.numeric(game),
+         point = as.numeric(point),
+         serve = as.numeric(serve)) |>
+  ## matchScore parsing:
+  mutate(matchScore = sub("^.", "", matchScore)) |>
+  mutate(matchScore = sub(".$", "", matchScore)) |>
+  separate(matchScore, into = c("player1_set1_score",
+                                "player1_set2_score",
+                                "player1_set3_score",
+                                "player1_set4_score",
+                                "player1_set5_score",
+                                "player1_set1_tbscore",
+                                "player1_set2_tbscore",
+                                "player1_set3_tbscore",
+                                "player1_set4_tbscore",
+                                "player1_set5_tbscore",
+                                "player2_set1_score",
+                                "player2_set2_score",
+                                "player2_set3_score",
+                                "player2_set4_score",
+                                "player2_set5_score",
+                                "player2_set1_tbscore",
+                                "player2_set2_tbscore",
+                                "player2_set3_tbscore",
+                                "player2_set4_tbscore",
+                                "player2_set5_tbscore",
+                                "player1_game_score",
+                                "player2_game_score"), sep = ",") |>
+  separate(player1_set1_score, into = c("label", "player1_set1"), sep = ": ") |>
+  separate(player1_set2_score, into = c("label", "player1_set2"), sep = ": ") |>
+  separate(player1_set3_score, into = c("label", "player1_set3"), sep = ": ") |>
+  separate(player1_set4_score, into = c("label", "player1_set4"), sep = ": ") |>
+  separate(player1_set5_score, into = c("label", "player1_set5"), sep = ": ") |>
+  separate(player1_set1_tbscore, into = c("label", "player1_set1_tb"), sep = ": ") |>
+  separate(player1_set2_tbscore, into = c("label", "player1_set2_tb"), sep = ": ") |>
+  separate(player1_set3_tbscore, into = c("label", "player1_set3_tb"), sep = ": ") |>
+  separate(player1_set4_tbscore, into = c("label", "player1_set4_tb"), sep = ": ") |>
+  separate(player1_set5_tbscore, into = c("label", "player1_set5_tb"), sep = ": ") |>
+  separate(player2_set1_score, into = c("label", "player2_set1"), sep = ": ") |>
+  separate(player2_set2_score, into = c("label", "player2_set2"), sep = ": ") |>
+  separate(player2_set3_score, into = c("label", "player2_set3"), sep = ": ") |>
+  separate(player2_set4_score, into = c("label", "player2_set4"), sep = ": ") |>
+  separate(player2_set5_score, into = c("label", "player2_set5"), sep = ": ") |>
+  separate(player2_set1_tbscore, into = c("label", "player2_set1_tb"), sep = ": ") |>
+  separate(player2_set2_tbscore, into = c("label", "player2_set2_tb"), sep = ": ") |>
+  separate(player2_set3_tbscore, into = c("label", "player2_set3_tb"), sep = ": ") |>
+  separate(player2_set4_tbscore, into = c("label", "player2_set4_tb"), sep = ": ") |>
+  separate(player2_set5_tbscore, into = c("label", "player2_set5_tb"), sep = ": ") |>
+  separate(player1_game_score, into = c("label", "player1_game"), sep = ": ") |>
+  separate(player2_game_score, into = c("label", "player2_game"), sep = ": ") |>
+  mutate(player1_set1 = parse_number(player1_set1),
+         player1_set2 = parse_number(player1_set2),
+         player1_set3 = parse_number(player1_set3),
+         player1_set4 = parse_number(player1_set4),
+         player1_set5 = parse_number(player1_set5),
+         player2_set1 = parse_number(player2_set1),
+         player2_set2 = parse_number(player2_set2),
+         player2_set3 = parse_number(player2_set3),
+         player2_set4 = parse_number(player2_set4),
+         player2_set5 = parse_number(player2_set5),
+         player1_game = sub("^.", "", player1_game),
+         player1_game = sub(".$", "", player1_game),
+         player2_game = sub("^.", "", player2_game),
+         player2_game = sub(".$", "", player2_game)) |>
+  filter(serve == 1) |>
+  ## lag the game score to get accurate game score:
+  mutate(player1_game_lag = lag(player1_game, default = "0"),
+         player2_game_lag = lag(player2_game, default = "0")) |>
+  ## fill in the second serve points:
+  bind_rows(second_serve_points) |>
+  arrange(set, game, point, serve) |>
+  fill(player1_game_lag, player2_game_lag, .direction = "down") |>
+  mutate(player1_game_score = if_else(player1_game_lag == "GAME" | player2_game_lag == "GAME",
+                                      true = "0",
+                                      false = player1_game_lag)) |>
+  mutate(player2_game_score = if_else(player1_game_lag == "GAME" | player2_game_lag == "GAME",
+                                      true = "0",
+                                      false = player2_game_lag)) |>
+  ## fix tiebreak ending:
+  mutate(
+    # Safely convert to numeric, assigning NA if conversion fails
+    player1_score_numeric = suppressWarnings(as.numeric(player1_game_score)),
+    player2_score_numeric = suppressWarnings(as.numeric(player2_game_score)),
+
+    # Create a flag for the condition
+    reset_scores = !(player1_game_score %in% c("0", "15", "30", "40")) & 
+                   !(player2_game_score %in% c("0", "15", "30", "40")) & 
+                   !is.na(player1_score_numeric) & !is.na(player2_score_numeric) &
+                   player1_score_numeric + player2_score_numeric >= 12 & 
+                   abs(player1_score_numeric - player2_score_numeric) == 2,
+
+    # Use the flag to set both scores
+    player1_game_score = if_else(reset_scores, "0", player1_game_score),
+    player2_game_score = if_else(reset_scores, "0", player2_game_score)
+  ) |>
+  ## set score lag:
+  mutate(player1_set1_lag = ifelse(serve == 2, lag(player1_set1, 2, default = 0), lag(player1_set1, default = 0)),
+         player1_set2_lag = ifelse(serve == 2, lag(player1_set2, 2, default = 0), lag(player1_set2, default = 0)),
+         player1_set3_lag = ifelse(serve == 2, lag(player1_set3, 2, default = 0), lag(player1_set3, default = 0)),
+         player1_set4_lag = ifelse(serve == 2, lag(player1_set4, 2, default = 0), lag(player1_set4, default = 0)),
+         player1_set5_lag = ifelse(serve == 2, lag(player1_set5, 2, default = 0), lag(player1_set5, default = 0)),
+         player2_set1_lag = ifelse(serve == 2, lag(player2_set1, 2, default = 0), lag(player2_set1, default = 0)),
+         player2_set2_lag = ifelse(serve == 2, lag(player2_set2, 2, default = 0), lag(player2_set2, default = 0)),
+         player2_set3_lag = ifelse(serve == 2, lag(player2_set3, 2, default = 0), lag(player2_set3, default = 0)),
+         player2_set4_lag = ifelse(serve == 2, lag(player2_set4, 2, default = 0), lag(player2_set4, default = 0)),
+         player2_set5_lag = ifelse(serve == 2, lag(player2_set5, 2, default = 0), lag(player2_set5, default = 0))) |>
+  mutate(player1_set_score = case_when(set == 1 ~ player1_set1_lag,
+                                       set == 2 ~ player1_set2_lag,
+                                       set == 3 ~ player1_set3_lag,
+                                       set == 4 ~ player1_set4_lag,
+                                       set == 5 ~ player1_set5_lag)) |>
+  mutate(player2_set_score = case_when(set == 1 ~ player2_set1_lag,
+                                       set == 2 ~ player2_set2_lag,
+                                       set == 3 ~ player2_set3_lag,
+                                       set == 4 ~ player2_set4_lag,
+                                       set == 5 ~ player2_set5_lag)) |>
+  relocate(player1_game_score, player2_game_score, player1_set_score, player2_set_score)
+
+formatted_shot_level |> View()
+  
+  # # Store original player names and scores
+  # mutate(
+  #   original_player1 = player1,
+  #   original_player2 = player2,
+  #   original_player1_game_score = player1_game_score,
+  #   original_player2_game_score = player2_game_score,
+  #   original_player1_set_score = player1_set_score,
+  #   original_player2_set_score = player2_set_score
+  # ) |>
+  # 
+  # # TODO: this isn't exactly working as intended - look at Botic match in nadal_2022
+  # 
+  # # Rearrange players and scores based on whether they match "nadal"
+  # mutate(
+  #   player1 = case_when(
+  #     str_detect(str_to_lower(original_player1), player_of_interest) ~ original_player1,
+  #     str_detect(str_to_lower(original_player2), player_of_interest) ~ original_player2
+  #   ),
+  #   player2 = case_when(
+  #     str_detect(str_to_lower(original_player1), player_of_interest) ~ original_player2,
+  #     str_detect(str_to_lower(original_player2), player_of_interest) ~ original_player1
+  #   ),
+  #   player1_game_score = case_when(
+  #     str_detect(str_to_lower(original_player1), player_of_interest) ~ original_player1_game_score,
+  #     str_detect(str_to_lower(original_player2), player_of_interest) ~ original_player2_game_score
+  #   ),
+  #   player2_game_score = case_when(
+  #     str_detect(str_to_lower(original_player1), player_of_interest) ~ original_player2_game_score,
+  #     str_detect(str_to_lower(original_player2), player_of_interest) ~ original_player1_game_score
+  #   ),
+  #   player1_set_score = case_when(
+  #     str_detect(str_to_lower(original_player1), player_of_interest) ~ original_player1_set_score,
+  #     str_detect(str_to_lower(original_player2), player_of_interest) ~ original_player2_set_score
+  #   ),
+  #   player2_set_score = case_when(
+  #     str_detect(str_to_lower(original_player1), player_of_interest) ~ original_player2_set_score,
+  #     str_detect(str_to_lower(original_player2), player_of_interest) ~ original_player1_set_score
+  #   )
+  # ) |>
+  relocate(set, player1_game_score, player2_game_score, player1_set_score, player2_set_score, player1, player2) |>
+  View()
+```
+
+```{r}
+## Important test code:
+nadal_2022 <- fetch_all_matches(player = "Nadal", year = 2022)
+nadal_2022_cleaned <- clean_and_combine(nadal_2022, player_interest = "Nadal")
+clean_and_combine_point(test_match_steph_final) |> View()
+clean_and_combine_point(all_matches_2022) |> View()
+
+nadal_final_2022 <- fetch_all_matches(player = "Nadal", year = "2022", round = "F") # returns a list of data frames
+clean_point_level(nadal_final_2022[[1]]) # this function takes in one data frame (a single match)
+
+## Player names for binding:
+all_players <- bind_rows(read_csv(here::here("inst/player_ids/RG_players_2019.csv")),
+                         read_csv(here::here("inst/player_ids/RG_players_2020.csv")),
+                         read_csv(here::here("inst/player_ids/RG_players_2021.csv")),
+                         read_csv(here::here("inst/player_ids/RG_players_2022.csv")),
+                         read_csv(here::here("inst/player_ids/RG_players_2023.csv"))) |>
+  distinct(id, .keep_all = TRUE) |>
+  select(id, firstName, lastName)
+
+players_to_add <- tibble(id = c(31132, 43970, 31976, 42340,
+                                18005, 30524, 9525, 42560,
+                                11713, 42559, 12105, 32390,
+                                33597, 34635),
+                         firstName = c("Andrey", "Holger", "Hubert", "Lorenzo",
+                                       "Camila", "Fiona", "Gael", "Qinwen",
+                                       "Juan Martin", "Elina", "Leonardo", "Sebastian",
+                                       "Mikael", "Zdenek"),
+                         lastName = c("RUBLEV", "RUNE", "HURKACZ", "MUSETTI",
+                                      "GIORGI", "FERRO", "MONFILS", "ZHENG",
+                                      "DEL POTRO", "AVANESYAN", "MAYER", "OFNER",
+                                      "YMER", "KOLAR"))
+all_players <- bind_rows(all_players, players_to_add) |>
+  mutate(lastName = str_to_title(lastName)) |>
+  mutate(fullName = paste(firstName, lastName))
+
+write.csv(all_players, file = "all_players.csv")
+
+nadal_2022_cleaned |>
+  left_join(all_players, by = c("serverId" = "id")) |>
+  mutate(serverId = fullName) |>
+  select(-fullName) |>
+  left_join(all_players, by = c("scorerId" = "id")) |>
+  mutate(scorerId = fullName) |>
+  select(-fullName) |>
+  left_join(all_players, by = c("receiverId" = "id")) |>
+  mutate(receiverId = fullName) |>
+  View()
+```
+
+```{r}
+## trajectory parsing on cleaned and combined df
+nadal_2022_cleaned |> 
+  ## trajectoryData parsing:
+  mutate(trajectoryData = sub("^..", "", trajectoryData)) |>
+  mutate(trajectoryData = sub("..$", "", trajectoryData)) |>
+  separate_longer_delim(trajectoryData, delim = "}, {") |>
+  group_by(point_index) |>
+  mutate(shot_index = row_number()) |>
+  separate(trajectoryData, into = c("x", "y", "z", "position"), sep = "\\,") |>
+  mutate(x = parse_number(x),
+         y = parse_number(y),
+         z = parse_number(z),
+         position = sub("^.............", "", position)) |>
+  mutate(position = gsub("'", "", position)) |>
+  ## player_hit variable construction:
+  mutate(is_hit = if_else(position == "hit", true = 1, false = 0)) |>
+  group_by(point_index) |>
+  mutate(hit_count = cumsum(is_hit)) |>
+  mutate(player_hit = if_else(hit_count %% 2 == 1, serverId, receiverId)) |>
+  ## net_height and net_clearance variables:
+  mutate(net_height = 0.00619 * (y^2) + 0.914) |>
+  mutate(net_clearance = z - net_height) |>
+  relocate(set, player1_game_score, player2_game_score, player1_set_score, player2_set_score, player1, player2, x, y, z, position) |>
+  View()
+
+# Nice!
+clean_shot_level(nadal_2022_cleaned) |> View()
+```
+
+## Combine all matches into one .rda file
+```{r}
+list_all_matches <- fetch_all_matches() # list of 180 matches
+all_matches <- clean_and_combine(list_of_matches = list_all_matches)
+save(all_matches, file = "./data/all_matches.rda")
+
+## TODO: Now I need to make a new function that filters for a player of interest, returns a df that can be passed to clean_shot_level() function?
+filter_matches(player = "Rafael Nadal") |> View()
+all_matches_combined |> filter(player1 == "Rafael Nadal" | player2 == "Rafael Nadal")
+
+save(all_matches_importance, file = "./data/all_matches_importance.rda")
+```
 
 
 
