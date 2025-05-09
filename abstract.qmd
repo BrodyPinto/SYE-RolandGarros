@@ -1,9 +1,0 @@
----
-title: "Abstract"
-author: "Brody Pinto"
-format: html
----
-
-## Abstract
-
-At the highest level of tennis, a player's mental skillset is as -- if not, more -- important than their physical and technical skillset. Do the top champions of the sport handle pressure situations differently that sets them apart from the rest of the players? My goal was to leverage shot-by-shot data (including the exact coordinates of every ball hit) collected during the French Open -- the most prestigious clay court tournament in the world -- to answer this question. The data wrangling process involved meticulous data cleaning, match score parsing, and joining functions, but it allowed me to create powerful visualizations that illustrate how the best players in the world serve and return on the most important points. I found that for these important points, the best players tend to stick to their strengths when they're serving, but they tend to play more safe on the return of serve.

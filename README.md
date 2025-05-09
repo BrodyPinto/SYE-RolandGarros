@@ -19,7 +19,7 @@ The `trajectoryData` variable was initially stored as a JSON object. The followi
 
 I parsed this JSON object using the clear delimiters to obtain the cleaner format illustrated in the following table:
 
-![Trajectory Data parsed and formatted.](./trajectoryData.png)
+![Trajectory Data parsed and formatted.](./images/trajectoryData.png)
 
 <br>
 
@@ -27,7 +27,7 @@ I parsed this JSON object using the clear delimiters to obtain the cleaner forma
 
 In this analysis, I focus on the years of 2020-2023 since these years have fully operational and accurate `matchScore` and `trajectoryData` variables.
 
-![Point-level summary statistics by year and in total.](./summaryStats.png)
+![Point-level summary statistics by year and in total.](./images/summaryStats.png)
 
 <br>
 
@@ -35,7 +35,7 @@ In this analysis, I focus on the years of 2020-2023 since these years have fully
 
 One of the clearest opportunities a player has to control a point is on serve. At the professional level, the serve is not just a way to start the point -- it’s a weapon and often the first step in an intentional tactical sequence. Under pressure, however, even the most elite servers must make a choice: do they lean into their strengths, or do they adapt in response to the moment?
 
-![Blue dots represent serves on important points; black dots represent serves on non-important points. Note that the dots above the net are all serves to the deuce court and the dots below the net are all serves to the ad court.](./nadalServes.png)
+![Blue dots represent serves on important points; black dots represent serves on non-important points. Note that the dots above the net are all serves to the deuce court and the dots below the net are all serves to the ad court.](./images/nadalServes.png)
 
 <br>
 
@@ -47,13 +47,13 @@ Rafael Nadal’s serve placement throughout his 2022 French Open run offers a ma
 
 While the serve is about initiating control in the point, the return is about reclaiming it. Unlike on serve, where we observed elite players ramping up aggression under pressure, returners tend to embrace a different strategy: one rooted in discipline and consistency.
 
-![Blue dots represent serves on break points; black dots represent serves on non-break points.](./djokovicReturns.png)
+![Blue dots represent serves on break points; black dots represent serves on non-break points.](./images/djokovicReturns.png)
 
 <br>
 
 Novak Djokovic's return game is legendary, and his 2021 French Open title run offers textbook examples of why. On break points -- arguably the most pressure-filled moments for a returner -- Djokovic did not miss a single return. Across 58 break point chances, he successfully put every return back into play (see the following table), applying immense pressure on his opponents to win the point outright. His returns weren’t just in -- they were placed with surgical precision, often deep and toward the backhand side. This elite depth and accuracy -- particularly under pressure -- exemplify his ability to outmaneuver opponents mentally as well as physically.
 
-![Return statistics from Djokovic's 2021 French Open title run.](./djokovicTable.png)
+![Return statistics from Djokovic's 2021 French Open title run.](./images/djokovicTable.png)
 
 <br>
 
