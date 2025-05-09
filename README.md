@@ -4,6 +4,11 @@ The goal of this project is to move beyond simple outcome-based measures and use
 
 By leveraging tennis tracking technology, point importance scoring models, and visual analysis, this paper brings a data-driven perspective to a topic traditionally discussed in broad, subjective terms. In doing so, it aims to provide objective evidence of how the greatest players in tennis consistently manage to win the points that shape matches and, by extension, careers. Through careful examination of their shot patterns under pressure, this work reveals the subtle yet powerful ways that mental toughness and strategic clarity manifest themselves during the *most important* moments in tennis.
 
+For more information on this project and the findings, please view the
+[Paper](https://github.com/BrodyPinto/SYE-RolandGarros/blob/main/paper/the_paper.pdf)
+or
+[Presentation](https://github.com/BrodyPinto/SYE-RolandGarros/blob/main/poster/poster_final.pdf).
+
 <br>
 
 **`trajectoryData`**
